@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="autumn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Родовое дерево Шаповаловых</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="persons.json" type="application/json" id="persons-data-src"></script>
+  <style>
+    .person-card { cursor: pointer; transition: transform .15s, box-shadow .15s; }
+    .person-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+    .avatar-placeholder { background: linear-gradient(135deg, #d4a373, #a48262); }
+    #modal-overlay { display:none; }
+    #modal-overlay.open { display:flex; }
+    .rel-link { cursor:pointer; color: #7c3aed; text-decoration: underline; }
+    .rel-link:hover { color: #5b21b6; }
+    .tree-box { border: 2px solid #d4a373; border-radius: 12px; padding: 8px 14px; background: white; cursor: pointer; min-width: 130px; text-align: center; font-size: .8rem; }
+    .tree-box:hover { background: #fef3c7; }
+    .tree-line { border-top: 2px solid #d4a373; }
+    .tree-connector { border-left: 2px solid #d4a373; }
+    .generation-label { font-size:.7rem; color:#9ca3af; text-transform:uppercase; letter-spacing:1px; }
+    #search-input { transition: box-shadow .2s; }
+  </style>
+</head>
+<body class="bg-base-200 min-h-screen">
+
+<!-- HEADER -->
+<div class="navbar bg-base-100 shadow-md sticky top-0 z-30">
+  <div class="flex-1">
+    <span class="text-xl font-bold px-4">🌳 Родовое дерево Шаповаловых</span>
+  </div>
+  <div class="flex-none gap-2 px-4">
+    <div class="tabs tabs-boxed">
+      <a class="tab tab-active" id="tab-cards" onclick="showTab('cards')">Все люди</a>
+      <a class="tab" id="tab-tree" onclick="showTab('tree')">Дерево</a>
+      <a class="tab" id="tab-stats" onclick="showTab('stats')">Статистика</a>
+    </div>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="container mx-auto px-4 pt-6 pb-2" id="search-bar">
+  <input id="search-input" type="text" placeholder="🔍 Поиск по имени..." 
+    class="input input-bordered w-full max-w-md" oninput="filterCards(this.value)" />
+  <span class="ml-3 text-sm text-base-content/60" id="count-label"></span>
+</div>
+
+<!-- CARDS VIEW -->
+<div id="view-cards" class="container mx-auto px-4 py-4">
+  <div id="cards-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
+</div>
+
+<!-- TREE VIEW -->
+<div id="view-tree" class="hidden container mx-auto px-4 py-6">
+  <div class="flex gap-4 mb-6 items-center flex-wrap">
+    <label class="font-semibold">Центральная персона:</label>
+    <select id="tree-select" class="select select-bordered select-sm" onchange="renderTree(this.value)">
+    </select>
+  </div>
+  <div id="tree-container" class="overflow-x-auto"></div>
+</div>
+
+<!-- STATS VIEW -->
+<div id="view-stats" class="hidden container mx-auto px-4 py-6">
+  <div id="stats-content" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" class="fixed inset-0 z-50 bg-black/50 items-start justify-center pt-10 px-4"
+     onclick="closeModal(event)">
+  <div class="bg-base-100 rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto" onclick="event.stopPropagation()">
+    <div id="modal-content" class="p-6"></div>
+  </div>
+</div>
+
+<script>
+// ── Load data ──────────────────────────────────────────────
+let PERSONS = {};
+let currentTab = 'cards';
+
+async function loadData() {
+  try {
+    const r = await fetch('persons.json');
+    PERSONS = await r.json();
+  } catch(e) {
+    // fallback: try embedded
+    console.warn('Could not load persons.json:', e);
+  }
+  init();
+}
+
+function init() {
+  renderCards(Object.values(PERSONS));
+  populateTreeSelect();
+  renderStats();
+  updateCount(Object.values(PERSONS).length);
+  // default tree
+  const defaultKey = 'Шаповалов Тимофей_1';
+  if (PERSONS[defaultKey]) {
+    document.getElementById('tree-select').value = defaultKey;
+    renderTree(defaultKey);
+  }
+}
+
+// ── Helpers ────────────────────────────────────────────────
+function photoUrl(p) {
+  if (p.photo) return `photos/${p.photo}`;
+  return null;
+}
+
+function personDates(p) {
+  let s = '';
+  if (p.birth) s += p.birth;
+  if (p.death) s += ` – ${p.death}`;
+  return s;
+}
+
+function avatarHtml(p, size='w-16 h-16') {
+  const url = photoUrl(p);
+  if (url) {
+    return `<div class="avatar"><div class="${size} rounded-full overflow-hidden"><img src="${url}" alt="${p.full_name}" loading="lazy" onerror="this.parentElement.parentElement.innerHTML=avatarPlaceholder('${p.first_name||p.full_name||'?'}','${size}')"></div></div>`;
+  }
+  return avatarPlaceholder(p.first_name || p.full_name || '?', size);
+}
+
+function avatarPlaceholder(name, size='w-16 h-16') {
+  const letter = (name||'?')[0].toUpperCase();
+  return `<div class="avatar placeholder"><div class="${size} rounded-full avatar-placeholder text-white text-xl font-bold flex items-center justify-center"><span>${letter}</span></div></div>`;
+}
+
+// ── Cards ──────────────────────────────────────────────────
+function renderCards(persons) {
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = persons.map(p => `
+    <div class="card card-compact bg-base-100 shadow person-card" onclick="openPerson('${p.key}')">
+      <div class="card-body items-center text-center gap-2 pt-4">
+        ${avatarHtml(p, 'w-16 h-16')}
+        <div>
+          <div class="font-semibold text-sm leading-tight">${p.full_name || p.first_name || '?'}</div>
+          ${personDates(p) ? `<div class="text-xs text-base-content/60">${personDates(p)}</div>` : ''}
+          ${p.profession ? `<div class="badge badge-sm badge-outline mt-1">${p.profession.split('  ')[0].substring(0,20)}</div>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCards(q) {
+  const norm = q.toLowerCase().trim();
+  const filtered = norm
+    ? Object.values(PERSONS).filter(p =>
+        (p.full_name||'').toLowerCase().includes(norm) ||
+        (p.first_name||'').toLowerCase().includes(norm) ||
+        (p.surname||'').toLowerCase().includes(norm)
+      )
+    : Object.values(PERSONS);
+  renderCards(filtered);
+  updateCount(filtered.length);
+}
+
+function updateCount(n) {
+  document.getElementById('count-label').textContent = `${n} чел.`;
+}
+
+// ── Modal ──────────────────────────────────────────────────
+function openPerson(key) {
+  const p = PERSONS[key];
+  if (!p) return;
+  const overlay = document.getElementById('modal-overlay');
+  
+  const relSection = (label, keys, emoji) => {
+    const items = (keys||[]).filter(k => PERSONS[k]);
+    if (!items.length) return '';
+    const links = items.map(k => {
+      const rp = PERSONS[k];
+      return `<span class="rel-link" onclick="openPerson('${k}')">${rp.full_name || rp.first_name}</span>`;
+    }).join(', ');
+    return `<div class="mb-2"><span class="text-sm font-semibold">${emoji} ${label}:</span> <span class="text-sm">${links}</span></div>`;
+  };
+
+  document.getElementById('modal-content').innerHTML = `
+    <div class="flex justify-between items-start mb-4">
+      <h3 class="text-xl font-bold pr-4">${p.full_name || p.first_name || '?'}</h3>
+      <button class="btn btn-sm btn-ghost btn-circle" onclick="closeModalBtn()">✕</button>
+    </div>
+    <div class="flex gap-4 mb-4">
+      ${avatarHtml(p, 'w-24 h-24')}
+      <div class="flex-1">
+        ${p.birth ? `<div class="text-sm"><span class="font-medium">Дата рождения:</span> ${p.birth}</div>` : ''}
+        ${p.death ? `<div class="text-sm"><span class="font-medium">Дата смерти:</span> ${p.death}</div>` : ''}
+        ${p.profession ? `<div class="text-sm mt-1"><span class="badge badge-outline">${p.profession}</span></div>` : ''}
+      </div>
+    </div>
+    <div class="divider my-2"></div>
+    ${relSection('Супруг(а)', p.spouses, '💑')}
+    ${relSection('Родители', p.parents, '👨‍👩‍👧')}
+    ${relSection('Братья / Сёстры', p.siblings, '👫')}
+    ${relSection('Дети', p.children, '👶')}
+    <div class="mt-4">
+      <button class="btn btn-sm btn-outline" onclick="document.getElementById('tree-select').value='${p.key}'; renderTree('${p.key}'); closeModalBtn(); showTab('tree')">
+        🌳 Показать в дереве
+      </button>
+    </div>
+  `;
+  overlay.classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModalBtn();
+}
+function closeModalBtn() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// ── Tabs ───────────────────────────────────────────────────
+function showTab(tab) {
+  currentTab = tab;
+  ['cards','tree','stats'].forEach(t => {
+    document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tab);
+    document.getElementById(`tab-${t}`).classList.toggle('tab-active', t === tab);
+  });
+  document.getElementById('search-bar').classList.toggle('hidden', tab !== 'cards');
+}
+
+// ── Tree View ──────────────────────────────────────────────
+function populateTreeSelect() {
+  const sel = document.getElementById('tree-select');
+  const sorted = Object.values(PERSONS).sort((a,b) =>
+    (a.full_name||'').localeCompare(b.full_name||'', 'ru'));
+  sel.innerHTML = sorted.map(p =>
+    `<option value="${p.key}">${p.full_name || p.first_name}</option>`).join('');
+}
+
+function treeBox(key, isCenter=false) {
+  const p = PERSONS[key];
+  if (!p) return '';
+  const url = photoUrl(p);
+  const imgHtml = url
+    ? `<img src="${url}" class="w-10 h-10 rounded-full object-cover mx-auto mb-1" onerror="this.style.display='none'">`
+    : `<div class="w-10 h-10 rounded-full avatar-placeholder text-white font-bold flex items-center justify-center mx-auto mb-1">${(p.first_name||p.full_name||'?')[0]}</div>`;
+  const border = isCenter ? 'border-primary border-4' : '';
+  return `<div class="tree-box ${border} inline-block" onclick="openPerson('${key}')">
+    ${imgHtml}
+    <div class="font-semibold leading-tight">${p.full_name || p.first_name}</div>
+    ${p.birth ? `<div class="text-gray-400" style="font-size:.7rem">${p.birth.substring(0,4)}</div>` : ''}
+  </div>`;
+}
+
+function renderTree(centerKey) {
+  const p = PERSONS[centerKey];
+  if (!p) return;
+  const container = document.getElementById('tree-container');
+
+  // Grandparents (parents of parents)
+  const grandparents = [];
+  (p.parents||[]).forEach(pk => {
+    const par = PERSONS[pk];
+    if (par) (par.parents||[]).forEach(gpk => { if (!grandparents.includes(gpk)) grandparents.push(gpk); });
+  });
+
+  const makeRow = (keys, label, centerIdx=-1) => {
+    if (!keys.length) return '';
+    const boxes = keys.map((k,i) => `
+      <div class="flex flex-col items-center mx-2">
+        ${treeBox(k, i === centerIdx)}
+      </div>`).join('');
+    return `<div class="mb-1 text-center generation-label">${label}</div>
+      <div class="flex justify-center flex-wrap gap-2 mb-2">${boxes}</div>`;
+  };
+
+  // Spouses
+  const spouseBoxes = (p.spouses||[]).map(sk => treeBox(sk)).join('<div class="flex items-center mx-1 text-2xl text-amber-600">💑</div>');
+  const centerRow = `
+    <div class="mb-1 text-center generation-label">Персона</div>
+    <div class="flex justify-center items-center gap-2 mb-2">
+      ${treeBox(centerKey, true)}
+      ${p.spouses?.length ? '<div class="text-2xl mx-1">💑</div>' + p.spouses.map(sk=>treeBox(sk)).join('') : ''}
+    </div>`;
+
+  // Children + grandchildren
+  const childrenKeys = p.children || [];
+  const grandchildren = [];
+  childrenKeys.forEach(ck => {
+    (PERSONS[ck]?.children||[]).forEach(gck => { if (!grandchildren.includes(gck)) grandchildren.push(gck); });
+  });
+
+  container.innerHTML = `
+    <div class="min-w-max mx-auto py-4">
+      ${grandparents.length ? makeRow(grandparents, '🧓 Прародители') : ''}
+      ${makeRow(p.parents||[], '👨‍👩‍👧 Родители')}
+      ${centerRow}
+      ${childrenKeys.length ? makeRow(childrenKeys, '👶 Дети') : ''}
+      ${grandchildren.length ? makeRow(grandchildren.slice(0,12), '🍼 Внуки') : ''}
+    </div>`;
+}
+
+// ── Stats ──────────────────────────────────────────────────
+function renderStats() {
+  const persons = Object.values(PERSONS);
+  const total = persons.length;
+  const withPhoto = persons.filter(p => p.photo).length;
+  const deceased = persons.filter(p => p.death).length;
+  const withSpouse = persons.filter(p => p.spouses?.length).length;
+  const withChildren = persons.filter(p => p.children?.length).length;
+  
+  // Birth years for generation calc
+  const birthYears = persons.map(p => {
+    const m = (p.birth||'').match(/\b(\d{4})\b/);
+    return m ? parseInt(m[1]) : null;
+  }).filter(Boolean).sort();
+  
+  const oldest = birthYears[0];
+  const newest = birthYears[birthYears.length-1];
+  const generations = Math.round((newest - oldest) / 25);
+
+  // Surnames
+  const surnames = {};
+  persons.forEach(p => { if (p.surname) surnames[p.surname] = (surnames[p.surname]||0)+1; });
+  const topSurnames = Object.entries(surnames).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+  const card = (title, value, sub='', icon='') => `
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <div class="text-3xl">${icon}</div>
+        <div class="stat-value text-4xl font-bold">${value}</div>
+        <div class="font-semibold text-base-content/80">${title}</div>
+        ${sub ? `<div class="text-sm text-base-content/60">${sub}</div>` : ''}
+      </div>
+    </div>`;
+
+  document.getElementById('stats-content').innerHTML = `
+    ${card('Человек в дереве', total, 'Все задокументированные', '👥')}
+    ${card('С фотографией', withPhoto, `${Math.round(withPhoto/total*100)}% от всех`, '📷')}
+    ${card('Ушедших', deceased, 'Записана дата смерти', '🕯️')}
+    ${card('Семейных пар', Math.round(withSpouse/2), 'Супружеских союзов', '💑')}
+    ${card('С детьми', withChildren, 'Родителей в дереве', '👶')}
+    ${card('Поколений', `~${generations}`, `${oldest} – ${newest} гг.`, '🌳')}
+    <div class="card bg-base-100 shadow col-span-1 sm:col-span-2 lg:col-span-3">
+      <div class="card-body">
+        <h3 class="card-title">👨‍👩‍👧 Фамилии</h3>
+        <div class="flex flex-wrap gap-2 mt-2">
+          ${topSurnames.map(([sur, cnt]) =>
+            `<div class="badge badge-lg badge-outline">${sur} <span class="ml-1 font-bold">${cnt}</span></div>`
+          ).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── Init ───────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
