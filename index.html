@@ -8,459 +8,402 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <style>
-  html,body{margin:0;padding:0;overflow:hidden;height:100%;width:100%;}
+  html,body{margin:0;padding:0;overflow:hidden;height:100%;width:100%;user-select:none;}
   #app{display:flex;flex-direction:column;height:100vh;}
-  #tree-wrap{flex:1;overflow:hidden;background:#fdf6ec;cursor:grab;}
+  #tree-wrap{flex:1;background:#f8fafc;cursor:grab;position:relative;}
   #tree-wrap:active{cursor:grabbing;}
-  svg{display:block;}
-  .person-node{cursor:pointer;}
-  .person-node rect{transition:filter .15s;}
-  .person-node:hover rect{filter:drop-shadow(0 4px 12px rgba(0,0,0,.25));}
-  .couple-line{stroke:#b8864e;stroke-width:2;fill:none;}
-  .child-line{stroke:#b8864e;stroke-width:1.5;fill:none;}
-  .rel-link{cursor:pointer;fill:#7c3aed;text-decoration:underline;}
-  .search-highlight rect{stroke:#7c3aed!important;stroke-width:3!important;}
+  svg{display:block;width:100%;height:100%;}
+  
+  .link-spouse { stroke: #fbbf24; stroke-width: 3px; stroke-opacity: 0.8; }
+  .link-child { stroke: #94a3b8; stroke-width: 1.5px; stroke-opacity: 0.6; }
+  
+  .node rect { transition: all 0.2s; cursor: pointer; }
+  .node:hover rect { stroke: #7c3aed; stroke-width: 3px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
+  .node text { pointer-events: none; font-family: sans-serif; }
+  
+  .controls { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 8px; }
+  .gen-label { font-size: 12px; fill: #94a3b8; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+  .gen-line { stroke: #e2e8f0; stroke-dasharray: 4; stroke-width: 1; }
 </style>
 </head>
 <body>
 <div id="app">
   <!-- NAV -->
   <div class="navbar bg-base-100 shadow z-10 h-14 min-h-14 flex-shrink-0">
-    <div class="flex-1 pl-3">
-      <span class="font-bold text-lg">🌳 Родовое дерево Шаповаловых</span>
+    <div class="flex-1 px-2">
+      <span class="font-bold text-lg">🌳 Родовое дерево</span>
     </div>
-    <div class="flex-none gap-2 pr-3">
-      <input id="search-inp" type="text" placeholder="Поиск..." class="input input-sm w-40"
-        oninput="searchPerson(this.value)" />
-      <button class="btn btn-sm btn-ghost" onclick="resetView()" title="Вся семья">⊞</button>
+    <div class="flex-none gap-2 px-2">
+      <input id="search-inp" type="text" placeholder="Поиск..." class="input input-sm w-40 sm:w-64" oninput="searchNode(this.value)"/>
+      <button class="btn btn-sm btn-ghost" onclick="resetView()" title="Сброс вида">⊞</button>
     </div>
   </div>
 
-  <!-- TREE -->
+  <!-- TREE CONTAINER -->
   <div id="tree-wrap">
-    <svg id="tree-svg"><g id="tree-g"></g></svg>
+    <svg id="svg">
+      <g id="viewport">
+        <g id="gen-layer"></g>
+        <g id="link-layer"></g>
+        <g id="node-layer"></g>
+      </g>
+    </svg>
+    
+    <div class="controls">
+      <button class="btn btn-circle btn-sm shadow bg-white" onclick="changeZoom(1.2)">+</button>
+      <button class="btn btn-circle btn-sm shadow bg-white" onclick="changeZoom(0.8)">-</button>
+      <button class="btn btn-sm shadow bg-white" onclick="togglePhysics()" id="phys-btn">❄️ Заморозить</button>
+    </div>
   </div>
 </div>
 
-<!-- MODAL -->
-<dialog id="pm" class="modal">
+<!-- INFO MODAL -->
+<dialog id="modal" class="modal">
   <div class="modal-box w-full max-w-md">
     <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost absolute right-3 top-3">✕</button></form>
-    <div id="pm-body"></div>
+    <div id="modal-content"></div>
   </div>
   <form method="dialog" class="modal-backdrop"><button>close</button></form>
 </dialog>
 
 <script>
-// ═══════════════════════════════════════════════════
-//  CONSTANTS
-// ═══════════════════════════════════════════════════
-const NW = 130, NH = 80, XGAP = 30, YGAP = 100;
-const FEMALE_COLOR = '#dbeafe', MALE_COLOR = '#dcfce7', UNKNOWN_COLOR = '#f3f4f6';
-const LINE_COLOR = '#b8864e';
+// CONFIG
+const W_NODE = 140, H_NODE = 60;
+const Y_STEP = 140; // Height between generations
+const CHARGE = -800;
+const LINK_DIST_SPOUSE = 60;
+const LINK_DIST_CHILD = 100;
 
-const FEMALE_NAMES = new Set(['наталия','наталья','елизавета','лидия','виктория','лариса','светлана','адель','оксана','екатерина','ольга','прасковия','миля','тоня','лена','дуня','татьяна','марьяна','галина','галя','валя','нина','жанна','рая','люда','соня','христя','варвара','пелагея','олена','диана','настя','кира','аня','алла','тамила','ирина','ира','мария','маня','зина','лиза','арина','тетяна','люба','лидия','юлия','оришка','вера','ксения','дина','дарья','катя','света','валя']);
-
+// STATE
 let PERSONS = {};
-let layout = {}; // key -> {x, y, gen}
-let svgG, zoom, svgEl;
+let nodes = [], links = [];
+let simulation;
+let zoom;
+let svg, gView, gNodes, gLinks, gGen;
+let isFrozen = false;
 
-// ═══════════════════════════════════════════════════
-//  LOAD & INIT
-// ═══════════════════════════════════════════════════
-async function loadData() {
-  const r = await fetch('persons.json');
-  PERSONS = await r.json();
-  buildLayout();
-  renderTree();
-  setTimeout(() => centerOn('Шаповалов Тимофей_1'), 100);
+// INIT
+async function init() {
+  try {
+    const r = await fetch('persons.json');
+    PERSONS = await r.json();
+    setupD3();
+    buildGraph();
+    startSim();
+  } catch(e) { console.error(e); alert('Ошибка загрузки данных'); }
 }
 
-// ═══════════════════════════════════════════════════
-//  GENERATION ASSIGNMENT (BFS from roots)
-// ═══════════════════════════════════════════════════
-function buildLayout() {
-  const gen = {};
-  const visited = new Set();
-
-  // roots = persons with no known parents
-  const roots = Object.keys(PERSONS).filter(k => !(PERSONS[k].parents?.length));
-
-  const queue = roots.map(k => [k, 0]);
-  while (queue.length) {
-    const [k, g] = queue.shift();
-    if (visited.has(k)) {
-      if ((gen[k] || 0) < g) gen[k] = g; // push down if needed
-      continue;
-    }
-    visited.add(k);
-    gen[k] = g;
-    const p = PERSONS[k];
-    if (!p) continue;
-    (p.spouses || []).forEach(sk => { if (!visited.has(sk)) queue.unshift([sk, g]); });
-    (p.children || []).forEach(ck => { if (!visited.has(ck)) queue.push([ck, g + 1]); });
-  }
-  // Unvisited (disconnected): put at max gen
-  const maxG = Math.max(0, ...Object.values(gen));
-  Object.keys(PERSONS).forEach(k => { if (gen[k] == null) gen[k] = maxG; });
-
-  // ── X layout per generation ──────────────────────
-  // Group each generation: keep spouses adjacent, family groups together
-  const byGen = {};
-  Object.keys(PERSONS).forEach(k => {
-    const g = gen[k];
-    (byGen[g] = byGen[g] || []).push(k);
-  });
-
-  // For each generation, sort by:
-  // 1. Which parent group they belong to (keeps siblings together)
-  // 2. Spouse pairs adjacent
-  const sorted = {};
-  Object.entries(byGen).forEach(([g, keys]) => {
-    // Build family groups: keys with same parents grouped together, then couples adjacent
-    const familyKey = k => {
-      const p = PERSONS[k];
-      const parents = (p.parents || []).slice().sort().join('|');
-      return parents || 'root';
-    };
-    // Group by family
-    const groups = {};
-    keys.forEach(k => {
-      const fk = familyKey(k);
-      (groups[fk] = groups[fk] || []).push(k);
-    });
-    // Within each group, keep couples adjacent
-    const ordered = [];
-    Object.values(groups).forEach(grp => {
-      const placed = new Set();
-      grp.forEach(k => {
-        if (placed.has(k)) return;
-        placed.add(k);
-        ordered.push(k);
-        // Place spouse right after
-        const p = PERSONS[k];
-        (p.spouses || []).forEach(sk => {
-          if (grp.includes(sk) && !placed.has(sk)) {
-            placed.add(sk);
-            ordered.push(sk);
-          }
-        });
-      });
-    });
-    sorted[g] = ordered;
-  });
-
-  // Assign x sequentially
-  const x = {}, y = {};
-  Object.entries(sorted).forEach(([g, keys]) => {
-    keys.forEach((k, i) => {
-      x[k] = i * (NW + XGAP);
-      y[k] = Number(g) * (NH + YGAP);
-    });
-  });
-
-  layout = { gen, x, y, sorted };
-}
-
-// ═══════════════════════════════════════════════════
-//  GENDER DETECTION
-// ═══════════════════════════════════════════════════
-function gender(p) {
-  const name = (p.first_name || p.full_name || '').trim().toLowerCase();
-  const first = name.split(' ')[0];
-  if (FEMALE_NAMES.has(first)) return 'f';
-  // Common male endings in Russian
-  if (/[йнм]$/.test(first) || /ий$/.test(first) || /ев$/.test(first)) return 'm';
-  return '?';
-}
-
-function nodeColor(p) {
-  const g = gender(p);
-  return g === 'f' ? FEMALE_COLOR : g === 'm' ? MALE_COLOR : UNKNOWN_COLOR;
-}
-
-// ═══════════════════════════════════════════════════
-//  RENDER
-// ═══════════════════════════════════════════════════
-function renderTree() {
-  svgEl = document.getElementById('tree-svg');
-  const wrap = document.getElementById('tree-wrap');
-  svgEl.setAttribute('width', wrap.clientWidth);
-  svgEl.setAttribute('height', wrap.clientHeight);
-
-  svgG = d3.select('#tree-g');
-  svgG.selectAll('*').remove();
-
-  const persons = Object.values(PERSONS);
-  const xs = Object.values(layout.x);
-  const ys = Object.values(layout.y);
-  const totalW = Math.max(...xs) + NW + 40;
-  const totalH = Math.max(...ys) + NH + 40;
+function setupD3() {
+  svg = d3.select('#svg');
+  gView = d3.select('#viewport');
+  gGen = d3.select('#gen-layer');
+  gLinks = d3.select('#link-layer');
+  gNodes = d3.select('#node-layer');
 
   zoom = d3.zoom()
-    .scaleExtent([0.05, 3])
-    .on('zoom', e => svgG.attr('transform', e.transform));
-  d3.select(svgEl).call(zoom);
-
-  // ── Draw couple + child connectors ────────────────
-  const drawnCouples = new Set();
-  persons.forEach(p => {
-    (p.spouses || []).forEach(sk => {
-      const cid = [p.key, sk].sort().join('|');
-      if (drawnCouples.has(cid)) return;
-      drawnCouples.add(cid);
-      const sp = PERSONS[sk];
-      if (!sp) return;
-
-      const x1 = layout.x[p.key] + NW, y1 = layout.y[p.key] + NH / 2;
-      const x2 = layout.x[sk], y2 = layout.y[sk] + NH / 2;
-      const mx = (x1 + (x1 + NW + x2) / 2) / 2; // midpoint of couple line
-
-      // Couple line
-      svgG.append('line')
-        .attr('class', 'couple-line')
-        .attr('x1', x1).attr('y1', y1)
-        .attr('x2', x2).attr('y2', y2);
-
-      // Find children of THIS couple
-      const children = (p.children || []).filter(ck => (PERSONS[ck]?.parents || []).includes(sk));
-      if (!children.length) return;
-
-      const midX = (x1 + x2) / 2;
-      const startY = y1;
-      const dropY = startY + NH / 2 + YGAP * 0.35;
-
-      // Drop line from couple midpoint
-      svgG.append('line').attr('class', 'child-line')
-        .attr('x1', midX).attr('y1', startY)
-        .attr('x2', midX).attr('y2', dropY);
-
-      // Horizontal bar spanning all children
-      const childXs = children.map(ck => layout.x[ck] + NW / 2);
-      const minCX = Math.min(...childXs), maxCX = Math.max(...childXs);
-      if (children.length > 1) {
-        svgG.append('line').attr('class', 'child-line')
-          .attr('x1', Math.min(midX, minCX)).attr('y1', dropY)
-          .attr('x2', Math.max(midX, maxCX)).attr('y2', dropY);
-      }
-
-      // Lines down to each child
-      children.forEach(ck => {
-        const cx = layout.x[ck] + NW / 2, cy = layout.y[ck];
-        svgG.append('line').attr('class', 'child-line')
-          .attr('x1', cx).attr('y1', dropY)
-          .attr('x2', cx).attr('y2', cy);
-      });
-    });
-  });
-
-  // Single-parent connectors (persons with 1 parent)
-  persons.forEach(p => {
-    if (!p.parents?.length) return;
-    const singleParent = p.parents.find(pk => {
-      const par = PERSONS[pk];
-      if (!par) return false;
-      const hasCommonChild = (par.spouses || []).some(sk =>
-        (PERSONS[p.parents[0]]?.spouses || []).includes(sk) ||
-        p.parents.includes(sk)
-      );
-      return !hasCommonChild && p.parents.length === 1;
-    });
-    if (singleParent) {
-      const px = layout.x[singleParent] + NW / 2, py = layout.y[singleParent] + NH;
-      const cx = layout.x[p.key] + NW / 2, cy = layout.y[p.key];
-      svgG.append('path').attr('class', 'child-line')
-        .attr('d', `M${px},${py} L${px},${(py+cy)/2} L${cx},${(py+cy)/2} L${cx},${cy}`);
-    }
-  });
-
-  // ── Draw person nodes ──────────────────────────────
-  const nodes = svgG.selectAll('.person-node')
-    .data(persons)
-    .enter().append('g')
-    .attr('class', 'person-node')
-    .attr('data-key', d => d.key)
-    .attr('transform', d => `translate(${layout.x[d.key]},${layout.y[d.key]})`)
-    .on('click', (e, d) => openModal(d.key));
-
-  // Card background
-  nodes.append('rect')
-    .attr('width', NW).attr('height', NH)
-    .attr('rx', 8).attr('ry', 8)
-    .attr('fill', d => nodeColor(d))
-    .attr('stroke', LINE_COLOR)
-    .attr('stroke-width', 1.5)
-    .attr('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,.12))');
-
-  // Photo or initial circle
-  nodes.each(function(d) {
-    const g = d3.select(this);
-    const cx = 24, cy = 24, r = 18;
-    if (d.photo) {
-      // Clip path for circular photo
-      const clipId = `clip-${d.key.replace(/[^a-z0-9]/gi,'_')}`;
-      svgG.append('clipPath').attr('id', clipId)
-        .append('circle').attr('cx', layout.x[d.key]+cx).attr('cy', layout.y[d.key]+cy).attr('r', r);
-      g.append('image')
-        .attr('href', `photos/${d.photo}`)
-        .attr('x', cx-r).attr('y', cy-r)
-        .attr('width', r*2).attr('height', r*2)
-        .attr('clip-path', `url(#${clipId})`)
-        .attr('preserveAspectRatio', 'xMidYMid slice')
-        .on('error', function(){ d3.select(this).remove(); drawInitial(g, d, cx, cy, r); });
-    } else {
-      drawInitial(g, d, cx, cy, r);
-    }
-  });
-
-  function drawInitial(g, d, cx, cy, r) {
-    const col = gender(d) === 'f' ? '#3b82f6' : gender(d) === 'm' ? '#16a34a' : '#6b7280';
-    g.append('circle').attr('cx',cx).attr('cy',cy).attr('r',r).attr('fill',col);
-    g.append('text')
-      .attr('x',cx).attr('y',cy+5)
-      .attr('text-anchor','middle').attr('fill','white')
-      .attr('font-size',14).attr('font-weight','bold')
-      .text((d.first_name || d.full_name || '?')[0]);
-  }
-
-  // Name text
-  nodes.append('text')
-    .attr('x', 50).attr('y', 18)
-    .attr('font-size', 11).attr('font-weight', '600')
-    .attr('fill', '#1f2937')
-    .each(function(d) {
-      const name = d.full_name || d.first_name || '?';
-      const words = name.split(' ');
-      const el = d3.select(this);
-      // Max 2 lines
-      if (words.length === 1 || name.length <= 14) {
-        el.text(name);
-      } else {
-        const mid = Math.ceil(words.length/2);
-        el.append('tspan').attr('x',50).attr('dy',0).text(words.slice(0,mid).join(' '));
-        el.append('tspan').attr('x',50).attr('dy',13).text(words.slice(mid).join(' '));
-      }
-    });
-
-  // Dates
-  nodes.append('text')
-    .attr('x', 50).attr('y', 55)
-    .attr('font-size', 9).attr('fill', '#6b7280')
-    .text(d => {
-      let s = d.birth ? d.birth.substring(0,4) : '';
-      if (d.death) s += '–' + d.death.substring(0,4);
-      return s;
-    });
-
-  // Profession badge (small)
-  nodes.each(function(d) {
-    if (!d.profession) return;
-    const prof = d.profession.split('  ')[0].substring(0,18);
-    d3.select(this).append('text')
-      .attr('x', 50).attr('y', 68)
-      .attr('font-size', 8).attr('fill', '#7c3aed')
-      .attr('font-style','italic')
-      .text(prof);
+    .scaleExtent([0.1, 4])
+    .on('zoom', e => gView.attr('transform', e.transform));
+  
+  svg.call(zoom).on('dblclick.zoom', null);
+  
+  // Responsive resize
+  window.addEventListener('resize', () => {
+    simulation.alpha(0.3).restart();
   });
 }
 
-// ═══════════════════════════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════════════════════════
-function centerOn(key) {
-  const wrap = document.getElementById('tree-wrap');
-  const W = wrap.clientWidth, H = wrap.clientHeight;
-  const px = layout.x[key] ?? 0, py = layout.y[key] ?? 0;
-  const tx = W/2 - (px + NW/2), ty = H/2 - (py + NH/2);
-  d3.select(svgEl).transition().duration(600)
-    .call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(1));
+// GRAPH BUILDER
+function buildGraph() {
+  // 1. Assign Generations (BFS)
+  const roots = Object.values(PERSONS).filter(p => !p.parents || p.parents.length === 0);
+  const genMap = {};
+  const q = roots.map(p => ({id: p.key, g: 0}));
+  const visited = new Set();
+  
+  // Init all with 0 (default)
+  Object.keys(PERSONS).forEach(k => genMap[k] = 0);
+
+  // Run BFS
+  while(q.length) {
+    const {id, g} = q.shift();
+    if(visited.has(id)) {
+      if(g > genMap[id]) genMap[id] = g; // Push down if found deeper path
+      continue;
+    }
+    visited.add(id);
+    genMap[id] = g;
+    
+    const p = PERSONS[id];
+    // Spouses = same gen
+    (p.spouses || []).forEach(sid => {
+      if(PERSONS[sid]) q.push({id: sid, g: g});
+    });
+    // Children = next gen
+    (p.children || []).forEach(cid => {
+      if(PERSONS[cid]) q.push({id: cid, g: g + 1});
+    });
+  }
+  
+  // Normalize gens (start from 0)
+  const minG = Math.min(...Object.values(genMap));
+  Object.keys(genMap).forEach(k => genMap[k] -= minG);
+
+  // 2. Create Nodes
+  nodes = Object.values(PERSONS).map(p => ({
+    id: p.key,
+    data: p,
+    gen: genMap[p.key] || 0,
+    x: 0, 
+    y: (genMap[p.key] || 0) * Y_STEP
+  }));
+
+  // 3. Create Links
+  links = [];
+  const processed = new Set();
+  
+  nodes.forEach(n => {
+    const p = n.data;
+    
+    // Spouse links (bidirectional, add once)
+    (p.spouses || []).forEach(sid => {
+      const pair = [n.id, sid].sort().join('|');
+      if(!processed.has(pair) && PERSONS[sid]) {
+        processed.add(pair);
+        links.push({source: n.id, target: sid, type: 'spouse'});
+      }
+    });
+
+    // Parent -> Child links
+    (p.children || []).forEach(cid => {
+      if(PERSONS[cid]) {
+        links.push({source: n.id, target: cid, type: 'child'});
+      }
+    });
+  });
+
+  drawGenerations(Math.max(...Object.values(genMap)));
+}
+
+function drawGenerations(maxGen) {
+  gGen.selectAll('*').remove();
+  for(let i=0; i<=maxGen; i++) {
+    const y = i * Y_STEP;
+    gGen.append('line')
+      .attr('class', 'gen-line')
+      .attr('x1', -5000).attr('x2', 5000)
+      .attr('y1', y).attr('y2', y);
+    gGen.append('text')
+      .attr('class', 'gen-label')
+      .attr('x', -480).attr('y', y - 5)
+      .text(`ПОКОЛЕНИЕ ${i+1}`);
+  }
+}
+
+// SIMULATION
+function startSim() {
+  simulation = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id)
+      .distance(d => d.type === 'spouse' ? LINK_DIST_SPOUSE : LINK_DIST_CHILD)
+      .strength(d => d.type === 'spouse' ? 1.5 : 0.8)
+    )
+    .force('charge', d3.forceManyBody().strength(CHARGE))
+    .force('collide', d3.forceCollide().radius(W_NODE/1.5).strength(1))
+    .force('y', d3.forceY().y(d => d.gen * Y_STEP).strength(4)) // Strict layers
+    .force('x', d3.forceX().strength(0.02)) // Slight center gravity
+    .on('tick', ticked);
+
+  // Drag behavior
+  const drag = d3.drag()
+    .on('start', e => {
+      if(!e.active) simulation.alphaTarget(0.3).restart();
+      e.subject.fx = e.subject.x;
+      e.subject.fy = e.subject.y;
+    })
+    .on('drag', e => {
+      e.subject.fx = e.x;
+      e.subject.fy = e.y;
+    })
+    .on('end', e => {
+      if(!e.active) simulation.alphaTarget(0);
+      e.subject.fx = null;
+      e.subject.fy = null;
+    });
+
+  // Render Links
+  const link = gLinks.selectAll('line')
+    .data(links)
+    .enter().append('line')
+    .attr('class', d => d.type === 'spouse' ? 'link-spouse' : 'link-child');
+
+  // Render Nodes
+  const node = gNodes.selectAll('.node')
+    .data(nodes)
+    .enter().append('g')
+    .attr('class', 'node')
+    .call(drag)
+    .on('click', (e, d) => {
+       if (e.defaultPrevented) return; // ignore drag-click
+       openModal(d.data);
+    });
+
+  // Node Shape
+  node.append('rect')
+    .attr('width', W_NODE).attr('height', H_NODE)
+    .attr('x', -W_NODE/2).attr('y', -H_NODE/2)
+    .attr('rx', 8).attr('ry', 8)
+    .attr('fill', d => getGenderColor(d.data))
+    .attr('stroke', '#cbd5e1')
+    .attr('stroke-width', 2);
+
+  // Photo / Initial
+  node.each(function(d) {
+    const g = d3.select(this);
+    const sz = 40;
+    const x = -W_NODE/2 + 10;
+    const y = -sz/2;
+    
+    // Clip path for photo
+    const clipId = 'clip-' + d.id.replace(/[^a-z0-9]/gi,'');
+    g.append('clipPath').attr('id', clipId)
+     .append('circle').attr('cx', x + sz/2).attr('cy', y + sz/2).attr('r', sz/2);
+
+    if(d.data.photo) {
+      g.append('image')
+        .attr('href', 'photos/' + d.data.photo)
+        .attr('x', x).attr('y', y)
+        .attr('width', sz).attr('height', sz)
+        .attr('clip-path', `url(#${clipId})`)
+        .attr('preserveAspectRatio', 'xMidYMid slice')
+        .on('error', function() { d3.select(this).remove(); drawInitial(g, d.data, x, y, sz); });
+    } else {
+      drawInitial(g, d.data, x, y, sz);
+    }
+  });
+
+  // Text Name
+  node.append('text')
+    .attr('x', -W_NODE/2 + 60).attr('y', -5)
+    .attr('font-size', '12px').attr('font-weight', 'bold')
+    .attr('fill', '#1e293b')
+    .text(d => truncate(d.data.full_name || d.data.first_name, 12));
+
+  // Text Dates
+  node.append('text')
+    .attr('x', -W_NODE/2 + 60).attr('y', 12)
+    .attr('font-size', '10px').attr('fill', '#64748b')
+    .text(d => cleanDates(d.data));
+
+  function ticked() {
+    link
+      .attr('x1', d => d.source.x)
+      .attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x)
+      .attr('y2', d => d.target.y);
+
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+  }
+}
+
+// HELPERS
+function getGenderColor(p) {
+  const name = (p.first_name || p.full_name || '').toLowerCase();
+  const maleEnds = ['й', 'м', 'н', 'р', 'с', 'в']; // Heuristic
+  // Simple heuristics, can be improved or read from data if available
+  const first = name.split(' ')[0];
+  if(['анна','мария','ольга','елена','татьяна','наталья','светлана'].includes(first)) return '#eff6ff'; // Female (blue tint)
+  if(['александр','сергей','иван','владимир'].includes(first)) return '#f0fdf4'; // Male (green tint)
+  return '#ffffff'; // Default white
+}
+
+function drawInitial(g, p, x, y, sz) {
+  g.append('circle').attr('cx', x+sz/2).attr('cy', y+sz/2).attr('r', sz/2).attr('fill', '#e2e8f0');
+  g.append('text').attr('x', x+sz/2).attr('y', y+sz/2+5).attr('text-anchor', 'middle')
+    .attr('font-size', '16px').attr('font-weight', 'bold').attr('fill', '#64748b')
+    .text((p.first_name || p.full_name || '?')[0]);
+}
+
+function truncate(str, n) {
+  if(!str) return '';
+  return str.length > n ? str.substr(0,n-1) + '..' : str;
+}
+
+function cleanDates(p) {
+  const b = (p.birth || '').substr(0,4);
+  const d = (p.death || '').substr(0,4);
+  if(!b) return '';
+  return b + (d ? ' - ' + d : '');
+}
+
+// UI ACTIONS
+function searchNode(q) {
+  const term = q.toLowerCase();
+  gNodes.selectAll('.node rect').attr('stroke', '#cbd5e1').attr('stroke-width', 2);
+  
+  if(!term) return;
+  const match = nodes.find(n => 
+    (n.data.full_name || '').toLowerCase().includes(term) ||
+    (n.data.first_name || '').toLowerCase().includes(term)
+  );
+  
+  if(match) {
+    gNodes.selectAll('.node').filter(d => d.id === match.id)
+      .select('rect').attr('stroke', '#ea580c').attr('stroke-width', 4);
+    
+    // Pan to node
+    svg.transition().duration(750).call(
+      zoom.transform,
+      d3.zoomIdentity.translate(window.innerWidth/2 - match.x, window.innerHeight/2 - match.y).scale(1)
+    );
+  }
+}
+
+function togglePhysics() {
+  const btn = document.getElementById('phys-btn');
+  if(isFrozen) {
+    simulation.alpha(0.3).restart();
+    btn.innerText = '❄️ Заморозить';
+    isFrozen = false;
+  } else {
+    simulation.stop();
+    btn.innerText = '▶️ Запустить';
+    isFrozen = true;
+  }
+}
+
+function changeZoom(factor) {
+  svg.transition().call(zoom.scaleBy, factor);
 }
 
 function resetView() {
-  const wrap = document.getElementById('tree-wrap');
-  const W = wrap.clientWidth, H = wrap.clientHeight;
-  const xs = Object.values(layout.x), ys = Object.values(layout.y);
-  const totalW = Math.max(...xs) + NW, totalH = Math.max(...ys) + NH;
-  const scale = Math.min(W / (totalW + 80), H / (totalH + 80), 1);
-  const tx = (W - totalW * scale) / 2, ty = (H - totalH * scale) / 2;
-  d3.select(svgEl).transition().duration(600)
-    .call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+  svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
 }
 
-// ═══════════════════════════════════════════════════
-//  SEARCH
-// ═══════════════════════════════════════════════════
-let searchTimeout;
-function searchPerson(q) {
-  clearTimeout(searchTimeout);
-  svgG.selectAll('.person-node').classed('search-highlight', false);
-  if (!q.trim()) return;
-  searchTimeout = setTimeout(() => {
-    const norm = q.toLowerCase();
-    const found = Object.values(PERSONS).filter(p =>
-      (p.full_name||'').toLowerCase().includes(norm) ||
-      (p.first_name||'').toLowerCase().includes(norm)
-    );
-    if (found.length) {
-      svgG.selectAll('.person-node')
-        .classed('search-highlight', d => found.some(f => f.key === d.key));
-      centerOn(found[0].key);
-    }
-  }, 300);
-}
-
-// ═══════════════════════════════════════════════════
-//  MODAL
-// ═══════════════════════════════════════════════════
-function openModal(key) {
-  const p = PERSONS[key];
-  if (!p) return;
-  const relSection = (label, keys, emoji) => {
-    const items = (keys||[]).filter(k => PERSONS[k]);
-    if (!items.length) return '';
-    return `<div class="mb-2"><span class="text-sm font-semibold">${emoji} ${label}:</span> ` +
-      items.map(k => `<span class="link link-primary text-sm cursor-pointer" onclick="goTo('${k}')">${PERSONS[k].full_name||PERSONS[k].first_name}</span>`).join(', ') + '</div>';
+function openModal(p) {
+  const content = document.getElementById('modal-content');
+  const rels = (label, arr) => {
+    if(!arr || !arr.length) return '';
+    return `<div class="mt-2"><div class="font-bold text-xs uppercase text-gray-400">${label}</div>` +
+    arr.map(id => {
+      const per = PERSONS[id];
+      return per ? `<span class="badge badge-outline mr-1 cursor-pointer hover:bg-base-200" onclick="searchNode('${per.full_name}')">${per.full_name}</span>` : '';
+    }).join('') + `</div>`;
   };
-  const photoHtml = p.photo
-    ? `<img src="photos/${p.photo}" class="w-20 h-20 rounded-full object-cover" onerror="this.style.display='none'">`
-    : `<div class="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold text-white" style="background:${gender(p)==='f'?'#3b82f6':gender(p)==='m'?'#16a34a':'#6b7280'}">${(p.first_name||p.full_name||'?')[0]}</div>`;
-  document.getElementById('pm-body').innerHTML = `
-    <h3 class="font-bold text-lg mb-3 pr-6">${p.full_name||p.first_name||'?'}</h3>
-    <div class="flex gap-4 mb-4">
-      ${photoHtml}
-      <div class="flex-1 text-sm">
-        ${p.birth?`<div><b>Рождение:</b> ${p.birth}</div>`:''}
-        ${p.death?`<div><b>Смерть:</b> ${p.death}</div>`:''}
-        ${p.profession?`<div class="badge badge-outline badge-sm mt-1">${p.profession}</div>`:''}
-      </div>
-    </div>
-    <div class="divider my-2"></div>
-    ${relSection('Супруг(а)', p.spouses, '💑')}
-    ${relSection('Родители', p.parents, '👨‍👩‍👧')}
-    ${relSection('Братья/Сёстры', p.siblings, '👫')}
-    ${relSection('Дети', p.children, '👶')}
-    <div class="modal-action mt-3">
-      <button class="btn btn-sm btn-outline" onclick="goTo('${key}')">🎯 Центрировать</button>
-      <form method="dialog"><button class="btn btn-sm">Закрыть</button></form>
-    </div>`;
-  document.getElementById('pm').showModal();
+
+  content.innerHTML = `
+    <h3 class="font-bold text-xl">${p.full_name || p.first_name}</h3>
+    <div class="text-gray-500 text-sm mb-4">${cleanDates(p)}</div>
+    ${p.photo ? `<img src="photos/${p.photo}" class="w-full max-h-64 object-contain rounded-lg bg-base-200 mb-4">` : ''}
+    ${p.profession ? `<div class="badge badge-primary mb-4">${p.profession}</div>` : ''}
+    
+    <div class="divider">Семья</div>
+    ${rels('Супруги', p.spouses)}
+    ${rels('Родители', p.parents)}
+    ${rels('Дети', p.children)}
+  `;
+  document.getElementById('modal').showModal();
 }
 
-function goTo(key) {
-  document.getElementById('pm').close();
-  centerOn(key);
-}
-
-// ═══════════════════════════════════════════════════
-//  RESIZE
-// ═══════════════════════════════════════════════════
-window.addEventListener('resize', () => {
-  const wrap = document.getElementById('tree-wrap');
-  svgEl.setAttribute('width', wrap.clientWidth);
-  svgEl.setAttribute('height', wrap.clientHeight);
-});
-
-loadData();
+init();
 </script>
 </body>
 </html>
