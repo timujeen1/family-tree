@@ -21,7 +21,7 @@
   .node:hover rect { stroke: #7c3aed; stroke-width: 3px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
   .node text { pointer-events: none; font-family: sans-serif; }
   
-  .controls { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 8px; }
+  .controls { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
   .gen-label { font-size: 12px; fill: #94a3b8; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
   .gen-line { stroke: #e2e8f0; stroke-dasharray: 4; stroke-width: 1; }
 </style>
@@ -52,6 +52,7 @@
     <div class="controls">
       <button class="btn btn-circle btn-sm shadow bg-white" onclick="changeZoom(1.2)">+</button>
       <button class="btn btn-circle btn-sm shadow bg-white" onclick="changeZoom(0.8)">-</button>
+      <button class="btn btn-sm shadow bg-white text-error" onclick="highlightOrphans()" title="Показать людей без связей">⚠️ Сироты</button>
       <button class="btn btn-sm shadow bg-white" onclick="togglePhysics()" id="phys-btn">❄️ Заморозить</button>
     </div>
   </div>
@@ -157,28 +158,34 @@ function buildGraph() {
     y: (genMap[p.key] || 0) * Y_STEP
   }));
 
-  // 3. Create Links
+  // 3. Create Links (BIDIRECTIONAL CHECK)
   links = [];
   const processed = new Set();
   
+  const addLink = (src, tgt, type) => {
+    if(!PERSONS[src] || !PERSONS[tgt]) return;
+    // Normalized pair key to avoid duplicates A-B vs B-A
+    const pair = [src, tgt].sort().join('|') + '|' + type;
+    if(processed.has(pair)) return;
+    processed.add(pair);
+    
+    // Always direct from source -> target for D3, but logic is bidirectional
+    links.push({source: src, target: tgt, type: type});
+  };
+
   nodes.forEach(n => {
     const p = n.data;
+    const id = n.id;
     
-    // Spouse links (bidirectional, add once)
-    (p.spouses || []).forEach(sid => {
-      const pair = [n.id, sid].sort().join('|');
-      if(!processed.has(pair) && PERSONS[sid]) {
-        processed.add(pair);
-        links.push({source: n.id, target: sid, type: 'spouse'});
-      }
-    });
+    // Spouses
+    (p.spouses || []).forEach(sid => addLink(id, sid, 'spouse'));
 
-    // Parent -> Child links
-    (p.children || []).forEach(cid => {
-      if(PERSONS[cid]) {
-        links.push({source: n.id, target: cid, type: 'child'});
-      }
-    });
+    // Parent -> Child (from children array)
+    (p.children || []).forEach(cid => addLink(id, cid, 'child'));
+
+    // Child -> Parent (from parents array - CRITICAL FIX)
+    // If THIS person lists someone as parent, link parent -> this person
+    (p.parents || []).forEach(pid => addLink(pid, id, 'child'));
   });
 
   drawGenerations(Math.max(...Object.values(genMap)));
@@ -240,6 +247,7 @@ function startSim() {
     .data(nodes)
     .enter().append('g')
     .attr('class', 'node')
+    .attr('data-id', d => d.id)
     .call(drag)
     .on('click', (e, d) => {
        if (e.defaultPrevented) return; // ignore drag-click
@@ -355,6 +363,28 @@ function searchNode(q) {
       d3.zoomIdentity.translate(window.innerWidth/2 - match.x, window.innerHeight/2 - match.y).scale(1)
     );
   }
+}
+
+function highlightOrphans() {
+  const orphans = nodes.filter(n => {
+    // Has NO links connected to this node
+    // Using D3 force simulation links structure (it modifies links to hold node references)
+    // But initially links hold objects {source: ID, target: ID}
+    return !links.some(l => 
+       (l.source.id === n.id || l.source === n.id || l.source === n) || 
+       (l.target.id === n.id || l.target === n.id || l.target === n)
+    );
+  });
+  
+  if(!orphans.length) { alert('Все люди имеют связи!'); return; }
+  
+  gNodes.selectAll('.node rect').attr('stroke', '#cbd5e1').attr('stroke-width', 2);
+  orphans.forEach(o => {
+    gNodes.select(`.node[data-id="${o.id}"] rect`)
+      .attr('stroke', '#ef4444')
+      .attr('stroke-width', 4);
+  });
+  alert(`Найдено ${orphans.length} людей без связей.\nОни подсвечены красным.`);
 }
 
 function togglePhysics() {
