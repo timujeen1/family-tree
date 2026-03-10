@@ -1797,7 +1797,9 @@
     "death": "",
     "profession": "",
     "photo": "image47.jpeg",
-    "spouses": [],
+    "spouses": [
+      "Лена_2"
+    ],
     "parents": [
       "Котлик Владимир",
       "Ольга_1"
@@ -3850,11 +3852,13 @@
     "death": "",
     "profession": "",
     "photo": "",
-    "spouses": [],
+    "spouses": [
+      "Котлик Игорь"
+    ],
     "parents": [],
     "children": [],
     "siblings": [],
-    "x": 12500,
+    "x": 12603,
     "y": 2091
   },
   "Keith Ronald Picotte": {
