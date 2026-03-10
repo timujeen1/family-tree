@@ -3047,10 +3047,13 @@
     "profession": "",
     "photo": "image36.jpeg",
     "spouses": [
+      "Бернс",
       "Keith Ronald Picotte"
     ],
     "parents": [],
-    "children": [],
+    "children": [
+      "Бернс Вильям"
+    ],
     "siblings": [
       "Оксана_1"
     ],
@@ -3247,7 +3250,10 @@
     "profession": "",
     "photo": "image41.jpeg",
     "spouses": [],
-    "parents": [],
+    "parents": [
+      "Лена_3",
+      "Бернс"
+    ],
     "children": [],
     "siblings": [],
     "x": 4112,
@@ -3837,8 +3843,8 @@
     "parents": [],
     "children": [],
     "siblings": [],
-    "x": 3305,
-    "y": 1780
+    "x": 12616,
+    "y": 448
   },
   "Keith Ronald Picotte": {
     "key": "Keith Ronald Picotte",
@@ -3873,5 +3879,25 @@
     "siblings": [],
     "x": 9441,
     "y": 435
+  },
+  "Бернс": {
+    "key": "Бернс",
+    "full_name": "Бернс",
+    "first_name": "",
+    "surname": "Бернс",
+    "birth": "",
+    "death": "",
+    "profession": "",
+    "photo": "",
+    "spouses": [
+      "Лена_3"
+    ],
+    "parents": [],
+    "children": [
+      "Бернс Вильям"
+    ],
+    "siblings": [],
+    "x": 4191,
+    "y": 448
   }
 }
