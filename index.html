@@ -174,11 +174,15 @@ function drawGenBands() {
   const xMax = Math.max(...allNodes.map(n => n.x)) + 600;
   const totalW = xMax - xMin;
 
-  const genNames = [
-    'Прапрапрадеды', 'Прапрадеды', 'Прадеды', 'Прародители',
-    'Прародители', 'Прародители', 'Дедушки и бабушки',
-    'Родители', 'Наше поколение', 'Дети'
-  ];
+  const total = centers.length;
+  function genLabel(i) {
+    const fromBottom = total - 1 - i; // 0 = самый молодой
+    if (fromBottom === 0) return 'Дети';
+    if (fromBottom === 1) return 'Наше поколение';
+    if (fromBottom === 2) return 'Родители';
+    const pra = 'Пра'.repeat(fromBottom - 2);
+    return pra + 'родители';
+  }
 
   gGen.selectAll('*').remove();
 
@@ -193,7 +197,7 @@ function drawGenBands() {
     gGen.append('text')
       .attr('class', 'gen-label')
       .attr('x', xMin + 14).attr('y', yTop + 18)
-      .text(genNames[i] || `Поколение ${i+1}`);
+      .text(genLabel(i));
   });
 }
 
