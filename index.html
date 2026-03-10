@@ -150,28 +150,48 @@ function buildGraph() {
 
 // ── GENERATION BANDS ─────────────────────────────
 function drawGenBands() {
-  // Compute distinct Y levels (rounded to nearest 100)
-  const yLevels = [...new Set(allNodes.map(n => Math.round(n.y / 200) * 200))].sort((a,b)=>a-b);
-  const BAND_H = 180;
-  const xMin = Math.min(...allNodes.map(n => n.x)) - 500;
-  const xMax = Math.max(...allNodes.map(n => n.x)) + 500;
-  const totalW = xMax - xMin;
+  // Cluster Y values into generation groups (gap > 200px = new generation)
+  const ys = allNodes.map(n => n.y).sort((a,b) => a-b);
+  const clusters = [];
+  let cur = [ys[0]];
+  for (let i = 1; i < ys.length; i++) {
+    if (ys[i] - ys[i-1] > 200) { clusters.push(cur); cur = []; }
+    cur.push(ys[i]);
+  }
+  clusters.push(cur);
 
-  gGen.selectAll('*').remove();
+  // Cluster centers
+  const centers = clusters.map(c => (Math.min(...c) + Math.max(...c)) / 2);
+
+  // Band boundaries: midpoints between consecutive centers
+  const bounds = [-Infinity];
+  for (let i = 1; i < centers.length; i++) {
+    bounds.push((centers[i-1] + centers[i]) / 2);
+  }
+  bounds.push(Infinity);
+
+  const xMin = Math.min(...allNodes.map(n => n.x)) - 600;
+  const xMax = Math.max(...allNodes.map(n => n.x)) + 600;
+  const totalW = xMax - xMin;
 
   const genNames = [
     'Основатели', 'Прапрадеды', 'Прадеды', 'Деды', 'Поколение 5',
-    'Поколение 6', 'Поколение 7 (родители)', 'Наше поколение', 'Дети'
+    'Поколение 6', 'Родители', 'Наше поколение', 'Дети'
   ];
 
-  yLevels.forEach((yc, i) => {
+  gGen.selectAll('*').remove();
+
+  centers.forEach((yc, i) => {
+    const yTop  = bounds[i]   === -Infinity ? yc - 400 : bounds[i];
+    const yBot  = bounds[i+1] ===  Infinity ? yc + 400 : bounds[i+1];
+    const bh = yBot - yTop;
     gGen.append('rect')
       .attr('class', i % 2 === 0 ? 'gen-band-even' : 'gen-band-odd')
-      .attr('x', xMin).attr('y', yc - BAND_H/2)
-      .attr('width', totalW).attr('height', BAND_H);
+      .attr('x', xMin).attr('y', yTop)
+      .attr('width', totalW).attr('height', bh);
     gGen.append('text')
       .attr('class', 'gen-label')
-      .attr('x', xMin + 10).attr('y', yc - BAND_H/2 + 16)
+      .attr('x', xMin + 14).attr('y', yTop + 18)
       .text(genNames[i] || `Поколение ${i+1}`);
   });
 }
