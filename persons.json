@@ -7,7 +7,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -21,7 +21,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Оксана_1"
     ],
@@ -39,7 +39,7 @@
     "birth": "19.11.1973",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Лида",
@@ -59,7 +59,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Слипко Максим"
     ],
@@ -80,7 +80,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Слипко Максим",
@@ -101,7 +101,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Река Омелько",
@@ -125,7 +125,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image66.jpeg",
+    "photo": "photos/image66.jpeg",
     "spouses": [
       "Кривонос Андрей_2"
     ],
@@ -143,7 +143,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Виктор_1",
@@ -162,16 +162,13 @@
     "birth": "12.06.1988",
     "death": "",
     "profession": "",
-    "photo": "image13.jpeg",
+    "photo": "photos/image13.jpeg",
     "spouses": [
-      "Грицай Юрий",
       "Бунецкий Максим"
     ],
     "parents": [
       "Кривонос Слава",
-      "Тамила_2",
-      "Котлик Владимир",
-      "Ольга_1"
+      "Тамила_2"
     ],
     "children": [
       "Аня_1",
@@ -190,7 +187,7 @@
     "birth": "1935",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Кривонос Леонтий",
@@ -215,7 +212,7 @@
     "birth": "1962",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Лена_4"
     ],
@@ -237,7 +234,7 @@
     "birth": "17.10.2012",
     "death": "",
     "profession": "",
-    "photo": "image6.jpeg",
+    "photo": "photos/image6.jpeg",
     "spouses": [],
     "parents": [
       "Шаповалов Тимофей_1",
@@ -256,7 +253,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image8.jpeg",
+    "photo": "photos/image8.jpeg",
     "spouses": [
       "Кривонос Сергей"
     ],
@@ -272,7 +269,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image18.jpeg",
+    "photo": "photos/image18.jpeg",
     "spouses": [
       "Река Андрей_2"
     ],
@@ -292,7 +289,7 @@
     "birth": "1902",
     "death": "1978",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Шаповалов Тимофей_2"
     ],
@@ -310,7 +307,7 @@
     "birth": "1936",
     "death": "2011",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Грыцай Григорий"
     ],
@@ -335,7 +332,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -349,7 +346,7 @@
     "birth": "1909",
     "death": "2003",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Река Андрей_1"
     ],
@@ -376,7 +373,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Христя"
     ],
@@ -401,7 +398,7 @@
     "birth": "03.02.1957",
     "death": "",
     "profession": "",
-    "photo": "image69.jpeg",
+    "photo": "photos/image69.jpeg",
     "spouses": [
       "Агапова Лена"
     ],
@@ -424,7 +421,7 @@
     "birth": "23.09.1912",
     "death": "29.03.2008",
     "profession": "Капитан 1-ранг",
-    "photo": "image4.jpeg",
+    "photo": "photos/image4.jpeg",
     "spouses": [
       "Романченко Диана"
     ],
@@ -440,18 +437,13 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
-    "spouses": [
-      "Буряк Иван"
-    ],
+    "photo": "",
+    "spouses": [],
     "parents": [
       "Виктор_2",
       "Светлана"
     ],
-    "children": [
-      "Оксана_1",
-      "Лена_3"
-    ],
+    "children": [],
     "siblings": [
       "Вадим"
     ]
@@ -464,13 +456,11 @@
     "birth": "21.07.1976",
     "death": "",
     "profession": "",
-    "photo": "image48.jpeg",
+    "photo": "photos/image48.jpeg",
     "spouses": [
       "Завалий Виталий"
     ],
     "parents": [
-      "Буряк Иван",
-      "Наталия_2",
       "Екатерина_1",
       "Белоглаз Владимир"
     ],
@@ -490,7 +480,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Слипко Ольга"
     ],
@@ -511,7 +501,7 @@
     "birth": "01.12.1953",
     "death": "",
     "profession": "Депутат",
-    "photo": "image12.jpeg",
+    "photo": "photos/image12.jpeg",
     "spouses": [
       "Лида"
     ],
@@ -531,30 +521,14 @@
     "birth": "19.08.2016",
     "death": "",
     "profession": "",
-    "photo": "image35.jpeg",
-    "spouses": [
-      "Наталия_2",
-      "Галина_2"
-    ],
+    "photo": "photos/image35.jpeg",
+    "spouses": [],
     "parents": [
-      "Река Омелько",
-      "Зина",
       "Алла",
       "Буряк Константин"
     ],
-    "children": [
-      "Оксана_1",
-      "Андрей_2",
-      "Лена_3"
-    ],
-    "siblings": [
-      "Александр",
-      "Река Мартин",
-      "Река Андрей_1",
-      "Река Яков",
-      "Река Борис",
-      "Река Илья"
-    ]
+    "children": [],
+    "siblings": []
   },
   "Пелагея": {
     "key": "Пелагея",
@@ -564,7 +538,7 @@
     "birth": "1870",
     "death": "1958",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Шаповалов Кузьма"
     ],
@@ -582,10 +556,8 @@
     "birth": "1939",
     "death": "",
     "profession": "",
-    "photo": "image64.jpeg",
-    "spouses": [
-      "Браилко Никола"
-    ],
+    "photo": "photos/image64.jpeg",
+    "spouses": [],
     "parents": [
       "Река Андрей_1",
       "Река Галина"
@@ -607,13 +579,10 @@
     "birth": "1973",
     "death": "",
     "profession": "Врач",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
-      "Галина_2",
-      "Буряк Иван",
-      "Виктор_1",
-      "Валентина"
+      "Галина_2"
     ],
     "children": [],
     "siblings": [
@@ -628,7 +597,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -642,7 +611,7 @@
     "birth": "2017",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Кривонос Андрей_2",
@@ -659,7 +628,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image50.jpeg",
+    "photo": "photos/image50.jpeg",
     "spouses": [
       "Виктор_2"
     ],
@@ -678,7 +647,7 @@
     "birth": "1930",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Кривонос Леонтий",
@@ -703,7 +672,7 @@
     "birth": "1904",
     "death": "1980",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Екатерина_2",
       "Варвара"
@@ -728,7 +697,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Река Омелько",
@@ -752,11 +721,8 @@
     "birth": "",
     "death": "",
     "profession": "Врач",
-    "photo": null,
-    "spouses": [
-      "Буряк Иван",
-      "Солоха Михаил"
-    ],
+    "photo": "",
+    "spouses": [],
     "parents": [],
     "children": [
       "Андрей_2",
@@ -774,7 +740,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image54.png",
+    "photo": "photos/image54.png",
     "spouses": [
       "Светлана"
     ],
@@ -793,17 +759,15 @@
     "birth": "18.05.1956",
     "death": "",
     "profession": "",
-    "photo": "image57.png",
+    "photo": "photos/image57.png",
     "spouses": [
-      "Котлик Владимир",
-      "Белолипецкий Матвей"
+      "Котлик Владимир"
     ],
     "parents": [
       "Солоха Михаил",
       "Галина_2"
     ],
     "children": [
-      "Екатерина_2",
       "Котлик Игорь",
       "Лена_5"
     ],
@@ -820,7 +784,7 @@
     "birth": "13.01.1930",
     "death": "25.11.2020",
     "profession": "",
-    "photo": "image62.jpeg",
+    "photo": "photos/image62.jpeg",
     "spouses": [
       "Пасичный Григорий"
     ],
@@ -843,7 +807,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Река Омелько"
     ],
@@ -872,7 +836,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Тертышна Ольга"
     ],
@@ -891,7 +855,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Екатерина_1"
     ],
@@ -910,10 +874,8 @@
     "birth": "1914",
     "death": "2003",
     "profession": "",
-    "photo": "image16.jpeg",
-    "spouses": [
-      "Вадим"
-    ],
+    "photo": "photos/image16.jpeg",
+    "spouses": [],
     "parents": [
       "Кривонос Леонтий",
       "Христя"
@@ -939,7 +901,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image44.jpeg",
+    "photo": "photos/image44.jpeg",
     "spouses": [
       "Ивашова Люда"
     ],
@@ -957,7 +919,7 @@
     "birth": "1965",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Браилко Сергей"
     ],
@@ -976,7 +938,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -990,7 +952,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Мария"
     ],
@@ -1009,7 +971,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -1023,7 +985,7 @@
     "birth": "",
     "death": "",
     "profession": "Фармацефт",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Никишин Александр"
     ],
@@ -1041,7 +1003,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Волошин Валера"
     ],
@@ -1068,7 +1030,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image30.jpeg",
+    "photo": "photos/image30.jpeg",
     "spouses": [],
     "parents": [
       "Кривонос Леонтий",
@@ -1093,7 +1055,7 @@
     "birth": "27.09.2016",
     "death": "",
     "profession": "",
-    "photo": "image23.jpeg",
+    "photo": "photos/image23.jpeg",
     "spouses": [],
     "parents": [
       "Шаповалов Тимофей_1",
@@ -1112,7 +1074,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image65.jpeg",
+    "photo": "photos/image65.jpeg",
     "spouses": [
       "Кривонос Фёдор"
     ],
@@ -1131,7 +1093,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image39.png",
+    "photo": "photos/image39.png",
     "spouses": [
       "Нина"
     ],
@@ -1147,7 +1109,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image38.jpeg",
+    "photo": "photos/image38.jpeg",
     "spouses": [
       "Виктор_1"
     ],
@@ -1166,7 +1128,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -1180,7 +1142,7 @@
     "birth": "17.07.1987",
     "death": "",
     "profession": "",
-    "photo": "image28.jpeg",
+    "photo": "photos/image28.jpeg",
     "spouses": [
       "Алла"
     ],
@@ -1198,7 +1160,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Екатерина_1"
     ],
@@ -1219,7 +1181,7 @@
     "birth": "04.05",
     "death": "",
     "profession": "",
-    "photo": "image53.jpeg",
+    "photo": "photos/image53.jpeg",
     "spouses": [
       "Белоглаз Владимир",
       "Никишин Владимир"
@@ -1246,7 +1208,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -1260,11 +1222,11 @@
     "birth": "2012",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
-      "Тертишний Василь",
-      "Тамила_2"
+      "Тамила_2",
+      "Кривонос Слава"
     ],
     "children": [],
     "siblings": [
@@ -1284,9 +1246,8 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image52.jpeg",
+    "photo": "photos/image52.jpeg",
     "spouses": [
-      "Тертишний Василь",
       "Кривонос Слава"
     ],
     "parents": [],
@@ -1294,7 +1255,6 @@
       "Арина",
       "Лена_6",
       "Волошин Валера",
-      "Тертишний Владимир",
       "Петрова Натагша",
       "Волошина Татьяна",
       "Лена_5",
@@ -1311,7 +1271,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image21.jpeg",
+    "photo": "photos/image21.jpeg",
     "spouses": [
       "Тертишний Илья"
     ],
@@ -1335,9 +1295,9 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
-      "Ольга_1"
+      "Ольга_2"
     ],
     "parents": [],
     "children": [
@@ -1353,7 +1313,7 @@
     "birth": "31.01.2000",
     "death": "",
     "profession": "",
-    "photo": "image9.jpeg",
+    "photo": "photos/image9.jpeg",
     "spouses": [],
     "parents": [
       "Виктория",
@@ -1372,7 +1332,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Кривонос Иван",
@@ -1394,13 +1354,11 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image19.jpeg",
+    "photo": "photos/image19.jpeg",
     "spouses": [],
     "parents": [
       "Грицай Юрий",
-      "Лена_5",
-      "Олег",
-      "Лукова Светлана"
+      "Лена_5"
     ],
     "children": [],
     "siblings": []
@@ -1413,7 +1371,7 @@
     "birth": "12.07.1983",
     "death": "",
     "profession": "Стоматолог Париж",
-    "photo": "image43.jpeg",
+    "photo": "photos/image43.jpeg",
     "spouses": [
       "Санникова Кира"
     ],
@@ -1434,7 +1392,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Кривонос Иван",
@@ -1456,7 +1414,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Слипко Максим",
@@ -1477,7 +1435,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Кривонос Иван"
     ],
@@ -1499,7 +1457,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Река Омелько",
@@ -1523,7 +1481,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Коба Оришка"
     ],
@@ -1542,7 +1500,7 @@
     "birth": "1960",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Тертишний Василь",
@@ -1566,7 +1524,7 @@
     "birth": "1913",
     "death": "1993",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Педашенко Василь",
@@ -1586,7 +1544,7 @@
     "birth": "",
     "death": "",
     "profession": "Сланци под Ленинградом",
-    "photo": "image26.jpeg",
+    "photo": "photos/image26.jpeg",
     "spouses": [
       "Тетяна"
     ],
@@ -1619,7 +1577,7 @@
     "birth": "10.05.1909",
     "death": "18.01.1991",
     "profession": "",
-    "photo": "image21.jpeg",
+    "photo": "photos/image21.jpeg",
     "spouses": [
       "Кривонос Андрей_1"
     ],
@@ -1643,9 +1601,9 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
-      "Татьяна_1"
+      "Татьяна_2"
     ],
     "parents": [
       "Виктор_2",
@@ -1666,7 +1624,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image47.jpeg",
+    "photo": "photos/image47.jpeg",
     "spouses": [],
     "parents": [
       "Котлик Владимир",
@@ -1685,7 +1643,7 @@
     "birth": "1941",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Люба"
     ],
@@ -1713,7 +1671,7 @@
     "birth": "29.04.1988",
     "death": "",
     "profession": "",
-    "photo": "image27.jpeg",
+    "photo": "photos/image27.jpeg",
     "spouses": [
       "Шаповалов Тимофей_1"
     ],
@@ -1735,7 +1693,7 @@
     "birth": "01.08.1975",
     "death": "",
     "profession": "",
-    "photo": "image7.jpeg",
+    "photo": "photos/image7.jpeg",
     "spouses": [
       "Олег"
     ],
@@ -1753,7 +1711,7 @@
     "birth": "01.06.1997",
     "death": "",
     "profession": "",
-    "photo": "image63.jpeg",
+    "photo": "photos/image63.jpeg",
     "spouses": [
       "Ледник Роман"
     ],
@@ -1774,7 +1732,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -1788,7 +1746,7 @@
     "birth": "22.08.1915",
     "death": "06.051995",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Педашенко Иван"
     ],
@@ -1810,7 +1768,7 @@
     "birth": "1915",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Педашенко Мария"
     ],
@@ -1835,7 +1793,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Петро"
     ],
@@ -1854,7 +1812,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -1868,7 +1826,7 @@
     "birth": "7.01.1926",
     "death": "26.03.2002",
     "profession": "Летчик",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Шаповалова Наталия_2"
     ],
@@ -1890,7 +1848,7 @@
     "birth": "25.12.1976",
     "death": "",
     "profession": "",
-    "photo": "image11.jpeg",
+    "photo": "photos/image11.jpeg",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -1904,7 +1862,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image34.jpeg",
+    "photo": "photos/image34.jpeg",
     "spouses": [
       "Лукова Светлана"
     ],
@@ -1927,7 +1885,7 @@
     "birth": "1960",
     "death": "",
     "profession": "Стоматолог",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Кривонос Вася"
     ],
@@ -1945,7 +1903,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Романченко Диана"
     ],
@@ -1966,7 +1924,7 @@
     "birth": "27.08.1995",
     "death": "",
     "profession": "",
-    "photo": "image68.jpeg",
+    "photo": "photos/image68.jpeg",
     "spouses": [
       "Настя"
     ],
@@ -1982,7 +1940,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Никишина Лидия"
     ],
@@ -2000,13 +1958,13 @@
     "birth": "1992",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Марьяна_2"
     ],
     "parents": [
-      "Тертишний Василь",
-      "Тамила_2"
+      "Тамила_2",
+      "Кривонос Слава"
     ],
     "children": [],
     "siblings": [
@@ -2026,7 +1984,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -2040,9 +1998,9 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
-      "Галина_2"
+      "Галина_1"
     ],
     "parents": [],
     "children": [
@@ -2060,7 +2018,7 @@
     "birth": "1937",
     "death": "18.04.2013",
     "profession": "",
-    "photo": "image70.jpeg",
+    "photo": "photos/image70.jpeg",
     "spouses": [
       "Соня"
     ],
@@ -2084,7 +2042,7 @@
     "birth": "08.01.1930",
     "death": "7.11.1914",
     "profession": "Библиотека детская литрат",
-    "photo": "image31.jpeg",
+    "photo": "photos/image31.jpeg",
     "spouses": [
       "Горшков Михаил",
       "Дудка Михаил"
@@ -2109,7 +2067,7 @@
     "birth": "1906",
     "death": "1994",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Педашенко София"
     ],
@@ -2125,9 +2083,9 @@
     "birth": "1961",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
-      "Лена_5"
+      "Лена_4"
     ],
     "parents": [
       "Тоня",
@@ -2146,7 +2104,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Тоня"
     ],
@@ -2164,7 +2122,7 @@
     "birth": "23.06.1993",
     "death": "",
     "profession": "",
-    "photo": "image20.jpeg",
+    "photo": "photos/image20.jpeg",
     "spouses": [
       "Буряк Константин"
     ],
@@ -2187,7 +2145,7 @@
     "birth": "07.09.1974",
     "death": "",
     "profession": "",
-    "photo": "image29.png",
+    "photo": "photos/image29.png",
     "spouses": [],
     "parents": [
       "Лида",
@@ -2207,7 +2165,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Шаповалов Тимофей_2",
@@ -2227,7 +2185,7 @@
     "birth": "31.01.2020",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Браилко Сергей",
@@ -2246,7 +2204,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [
@@ -2262,7 +2220,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -2276,7 +2234,7 @@
     "birth": "15.12.1998",
     "death": "",
     "profession": "",
-    "photo": "image14.jpeg",
+    "photo": "photos/image14.jpeg",
     "spouses": [],
     "parents": [
       "Оксана_1",
@@ -2293,7 +2251,7 @@
     "birth": "25.04.1959",
     "death": "21.06.2019",
     "profession": "Архитектор",
-    "photo": "image15.jpeg",
+    "photo": "photos/image15.jpeg",
     "spouses": [
       "Шаповалова Лариса"
     ],
@@ -2315,7 +2273,7 @@
     "birth": "12.05.1930",
     "death": "19.08.2018",
     "profession": "",
-    "photo": "image67.jpeg",
+    "photo": "photos/image67.jpeg",
     "spouses": [
       "Прасковия"
     ],
@@ -2339,7 +2297,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Слипко Максим",
@@ -2360,7 +2318,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -2374,7 +2332,7 @@
     "birth": "1937",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Кривонос Леонтий",
@@ -2399,7 +2357,7 @@
     "birth": "22.08.1965",
     "death": "",
     "profession": "",
-    "photo": "image58.jpeg",
+    "photo": "photos/image58.jpeg",
     "spouses": [
       "Слюсар Владимир"
     ],
@@ -2423,7 +2381,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Тертышна Ольга",
@@ -2442,7 +2400,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Зина"
     ],
@@ -2466,7 +2424,7 @@
     "birth": "1855",
     "death": "1961",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Пелагея"
     ],
@@ -2484,13 +2442,13 @@
     "birth": "1902",
     "death": "1950",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Шаповалов Тимофей_2"
     ],
     "parents": [
       "Белолипецкий Матвей",
-      "Ольга_1"
+      "Ольга_2"
     ],
     "children": [
       "Шаповалов Юрий_2",
@@ -2507,8 +2465,10 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image10.jpeg",
-    "spouses": [],
+    "photo": "photos/image10.jpeg",
+    "spouses": [
+      "Тертишний Василь"
+    ],
     "parents": [],
     "children": [],
     "siblings": []
@@ -2521,7 +2481,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image8.jpeg",
+    "photo": "photos/image8.jpeg",
     "spouses": [
       "Рая"
     ],
@@ -2545,7 +2505,7 @@
     "birth": "13.07.1932",
     "death": "",
     "profession": "",
-    "photo": "image61.jpeg",
+    "photo": "photos/image61.jpeg",
     "spouses": [
       "Кривонос Николай"
     ],
@@ -2571,7 +2531,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -2585,7 +2545,7 @@
     "birth": "30.10.1904",
     "death": "17.06.1983",
     "profession": "",
-    "photo": "image16.jpeg",
+    "photo": "photos/image16.jpeg",
     "spouses": [
       "Олена"
     ],
@@ -2615,7 +2575,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Ивашов Валерий",
@@ -2632,7 +2592,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Кривонос Леонтий"
     ],
@@ -2657,7 +2617,7 @@
     "birth": "21.10.1990",
     "death": "",
     "profession": "",
-    "photo": "image32.jpeg",
+    "photo": "photos/image32.jpeg",
     "spouses": [],
     "parents": [
       "Шаповалов Юрий_1",
@@ -2676,7 +2636,7 @@
     "birth": "27.10.1987",
     "death": "",
     "profession": "",
-    "photo": "image22.jpeg",
+    "photo": "photos/image22.jpeg",
     "spouses": [
       "Лидия"
     ],
@@ -2700,7 +2660,7 @@
     "birth": "1885",
     "death": "1961",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Педашенко Василь"
     ],
@@ -2727,7 +2687,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Тертишний Владимир",
@@ -2744,7 +2704,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -2758,7 +2718,7 @@
     "birth": "09.08.1964",
     "death": "",
     "profession": "",
-    "photo": "image45.jpeg",
+    "photo": "photos/image45.jpeg",
     "spouses": [
       "Виктория"
     ],
@@ -2777,14 +2737,11 @@
     "birth": "03.05.1985",
     "death": "",
     "profession": "",
-    "photo": "image36.jpeg",
+    "photo": "photos/image36.jpeg",
     "spouses": [
       "Keith Ronald Picotte"
     ],
-    "parents": [
-      "Буряк Иван",
-      "Наталия_2"
-    ],
+    "parents": [],
     "children": [],
     "siblings": [
       "Оксана_1"
@@ -2798,7 +2755,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -2812,7 +2769,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image37.jpeg",
+    "photo": "photos/image37.jpeg",
     "spouses": [
       "Валентина"
     ],
@@ -2837,7 +2794,7 @@
     "birth": "10.07.1977",
     "death": "",
     "profession": "",
-    "photo": "image25.jpeg",
+    "photo": "photos/image25.jpeg",
     "spouses": [],
     "parents": [
       "Лида",
@@ -2857,7 +2814,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -2871,7 +2828,7 @@
     "birth": "13.12.1957",
     "death": "",
     "profession": "",
-    "photo": "image49.jpeg",
+    "photo": "photos/image49.jpeg",
     "spouses": [
       "Шаповалов Юрий_1"
     ],
@@ -2895,7 +2852,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image55.jpeg",
+    "photo": "photos/image55.jpeg",
     "spouses": [
       "Кривонос Лаврентий"
     ],
@@ -2914,7 +2871,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -2928,7 +2885,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Река Омелько",
@@ -2952,7 +2909,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image41.jpeg",
+    "photo": "photos/image41.jpeg",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -2966,7 +2923,7 @@
     "birth": "05.01.1966",
     "death": "",
     "profession": "",
-    "photo": "image5.jpeg",
+    "photo": "photos/image5.jpeg",
     "spouses": [
       "Тамила_2"
     ],
@@ -2976,7 +2933,10 @@
     ],
     "children": [
       "Лена_5",
-      "Алла"
+      "Алла",
+      "Арина",
+      "Лена_6",
+      "Волошин Валера"
     ],
     "siblings": [
       "Кривонос Вася"
@@ -2990,7 +2950,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Вадим",
@@ -3007,7 +2967,7 @@
     "birth": "25.07.19",
     "death": "07.02.2016",
     "profession": "Врач",
-    "photo": "image17.jpeg",
+    "photo": "photos/image17.jpeg",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -3021,7 +2981,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -3035,7 +2995,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Река Омелько",
@@ -3059,7 +3019,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -3073,18 +3033,15 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image46.jpeg",
+    "photo": "photos/image46.jpeg",
     "spouses": [
-      "Тамила_2"
+      "Тамила_1"
     ],
     "parents": [
       "Тертышна Ольга",
       "Тертишний Илья"
     ],
     "children": [
-      "Арина",
-      "Лена_6",
-      "Волошин Валера",
       "Тертишний Владимир",
       "Петрова Натагша",
       "Волошина Татьяна",
@@ -3102,7 +3059,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image42.jpeg",
+    "photo": "photos/image42.jpeg",
     "spouses": [
       "Ольга_1"
     ],
@@ -3121,7 +3078,7 @@
     "birth": "10.08.2018",
     "death": "",
     "profession": "",
-    "photo": "image59.jpeg",
+    "photo": "photos/image59.jpeg",
     "spouses": [
       "Лена_1"
     ],
@@ -3139,7 +3096,7 @@
     "birth": "",
     "death": "",
     "profession": "Ленинград",
-    "photo": "image3.jpeg",
+    "photo": "photos/image3.jpeg",
     "spouses": [],
     "parents": [
       "Кривонос Иван",
@@ -3161,7 +3118,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Тертишний Василь",
@@ -3185,7 +3142,7 @@
     "birth": "26.07.1987",
     "death": "",
     "profession": "",
-    "photo": "image24.jpeg",
+    "photo": "photos/image24.jpeg",
     "spouses": [
       "Лена_5"
     ],
@@ -3203,11 +3160,11 @@
     "birth": "1984",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
-      "Тертишний Василь",
-      "Тамила_2"
+      "Тамила_2",
+      "Кривонос Слава"
     ],
     "children": [],
     "siblings": [
@@ -3227,7 +3184,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -3241,7 +3198,7 @@
     "birth": "09.04.2013",
     "death": "",
     "profession": "",
-    "photo": "image33.jpeg",
+    "photo": "photos/image33.jpeg",
     "spouses": [],
     "parents": [
       "Лена_5",
@@ -3258,7 +3215,7 @@
     "birth": "",
     "death": "",
     "profession": "Таллин",
-    "photo": "image2.jpeg",
+    "photo": "photos/image2.jpeg",
     "spouses": [
       "Лёня_2"
     ],
@@ -3282,7 +3239,7 @@
     "birth": "23.01.1927",
     "death": "7.05.1989",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Миля"
     ],
@@ -3298,7 +3255,7 @@
     "birth": "23.08.1925",
     "death": "17.01.1998",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Шаповалов Юрий_2"
     ],
@@ -3314,7 +3271,7 @@
     "birth": "25.02.1998",
     "death": "",
     "profession": "",
-    "photo": "image60.png",
+    "photo": "photos/image60.png",
     "spouses": [],
     "parents": [
       "Виктория",
@@ -3333,7 +3290,7 @@
     "birth": "",
     "death": "",
     "profession": "Врач",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -3346,8 +3303,8 @@
     "surname": "Река",
     "birth": "1903",
     "death": "1943",
-    "profession": "Кавалерист в 1917 Год рождения изменен с 1907",
-    "photo": null,
+    "profession": "Кавалерист в 1917  Год рождения изменен с 1907",
+    "photo": "",
     "spouses": [
       "Река Галина"
     ],
@@ -3378,7 +3335,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image56.jpeg",
+    "photo": "photos/image56.jpeg",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -3392,7 +3349,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [
       "Тертишний Владимир"
     ],
@@ -3410,7 +3367,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -3424,7 +3381,7 @@
     "birth": "1954",
     "death": "",
     "profession": "Гинеколог",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [
       "Тертишний Василь",
@@ -3448,7 +3405,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": "image40.jpeg",
+    "photo": "photos/image40.jpeg",
     "spouses": [
       "Ивашов Валерий"
     ],
@@ -3468,7 +3425,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],
@@ -3482,7 +3439,7 @@
     "birth": "18.01.1990",
     "death": "",
     "profession": "",
-    "photo": "image51.jpeg",
+    "photo": "photos/image51.jpeg",
     "spouses": [
       "Лена_3"
     ],
@@ -3498,7 +3455,7 @@
     "birth": "",
     "death": "",
     "profession": "",
-    "photo": null,
+    "photo": "",
     "spouses": [],
     "parents": [],
     "children": [],

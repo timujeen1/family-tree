@@ -335,9 +335,16 @@ function truncate(str, n) {
   return str.length > n ? str.substr(0,n-1) + '..' : str;
 }
 
+function extractYear(dateStr) {
+  if (!dateStr) return '';
+  // Format: YYYY or DD.MM.YYYY or MM.YYYY
+  const m = dateStr.match(/\b(\d{4})\b/);
+  return m ? m[1] : '';
+}
+
 function cleanDates(p) {
-  const b = (p.birth || '').substr(0,4);
-  const d = (p.death || '').substr(0,4);
+  const b = extractYear(p.birth);
+  const d = extractYear(p.death);
   if(!b) return '';
   return b + (d ? ' - ' + d : '');
 }
