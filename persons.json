@@ -506,6 +506,7 @@
     "profession": "",
     "photo": "image48.jpeg",
     "spouses": [
+      "Загорулько Вова",
       "Завалий Виталий"
     ],
     "parents": [
@@ -2053,7 +2054,9 @@
     "death": "",
     "profession": "",
     "photo": "image11.jpeg",
-    "spouses": [],
+    "spouses": [
+      "Оксана_1"
+    ],
     "parents": [],
     "children": [],
     "siblings": [],
