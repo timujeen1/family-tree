@@ -71,7 +71,9 @@
     "spouses": [
       "Слипко Максим"
     ],
-    "parents": [],
+    "parents": [
+      "Куприян_2"
+    ],
     "children": [
       "Слипко Алексндр",
       "Слипко Захарий",
@@ -663,11 +665,11 @@
     "death": "",
     "profession": "",
     "photo": "",
-    "spouses": [
+    "spouses": [],
+    "parents": [],
+    "children": [
       "Слипко Ольга"
     ],
-    "parents": [],
-    "children": [],
     "siblings": [],
     "x": 10405,
     "y": 107
@@ -902,7 +904,8 @@
     ],
     "parents": [
       "Петро",
-      "Мария"
+      "Мария",
+      "Куприян_1"
     ],
     "children": [
       "Буряк Иван",
@@ -3875,7 +3878,9 @@
     "photo": "",
     "spouses": [],
     "parents": [],
-    "children": [],
+    "children": [
+      "Зина"
+    ],
     "siblings": [],
     "x": 9441,
     "y": 435
