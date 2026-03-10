@@ -10,20 +10,29 @@
 <style>
   html,body{margin:0;padding:0;overflow:hidden;height:100%;width:100%;user-select:none;}
   #app{display:flex;flex-direction:column;height:100vh;}
-  #tree-wrap{flex:1;background:#f8fafc;cursor:grab;position:relative;}
+  #tree-wrap{flex:1;background:#f5f0eb;cursor:grab;position:relative;}
   #tree-wrap:active{cursor:grabbing;}
   svg{display:block;width:100%;height:100%;}
-  
-  .link-spouse { stroke: #fbbf24; stroke-width: 3px; stroke-opacity: 0.8; }
-  .link-child { stroke: #94a3b8; stroke-width: 1.5px; stroke-opacity: 0.6; }
-  
-  .node rect { transition: all 0.2s; cursor: pointer; }
-  .node:hover rect { stroke: #7c3aed; stroke-width: 3px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
-  .node text { pointer-events: none; font-family: sans-serif; }
-  
-  .controls { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-  .gen-label { font-size: 12px; fill: #94a3b8; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
-  .gen-line { stroke: #e2e8f0; stroke-dasharray: 4; stroke-width: 1; }
+
+  /* Links */
+  .link-spouse{stroke:#f59e0b;stroke-width:2.5px;stroke-opacity:0.9;fill:none;}
+  .link-child{stroke:#94a3b8;stroke-width:1.5px;stroke-opacity:0.5;fill:none;}
+  .link-child.highlighted{stroke:#f59e0b;stroke-width:2px;stroke-opacity:0.9;}
+
+  /* Nodes */
+  .node{cursor:pointer;}
+  .node rect{transition:all 0.15s;}
+  .node:hover rect{stroke:#7c3aed!important;stroke-width:2.5px;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.2));}
+  .node.found rect{stroke:#ea580c!important;stroke-width:3px;}
+  .node.dim{opacity:0.25;}
+
+  /* Generation bands */
+  .gen-band-even{fill:#f0ebe4;fill-opacity:0.5;}
+  .gen-band-odd{fill:#e8e2da;fill-opacity:0.5;}
+  .gen-label{font-size:11px;fill:#a0916a;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;}
+
+  /* Controls */
+  .controls{position:absolute;bottom:16px;right:16px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
 </style>
 </head>
 <body>
@@ -31,15 +40,16 @@
   <!-- NAV -->
   <div class="navbar bg-base-100 shadow z-10 h-14 min-h-14 flex-shrink-0">
     <div class="flex-1 px-2">
-      <span class="font-bold text-lg">🌳 Родовое дерево</span>
+      <span class="font-bold text-lg">🌳 Родовое дерево Шаповаловых</span>
     </div>
     <div class="flex-none gap-2 px-2">
-      <input id="search-inp" type="text" placeholder="Поиск..." class="input input-sm w-40 sm:w-64" oninput="searchNode(this.value)"/>
-      <button class="btn btn-sm btn-ghost" onclick="resetView()" title="Сброс вида">⊞</button>
+      <input id="search-inp" type="text" placeholder="Поиск..." class="input input-sm w-36 sm:w-60"
+             oninput="onSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';onSearch('');}"/>
+      <button class="btn btn-sm btn-ghost" onclick="resetView()" title="Показать всё">⊞</button>
     </div>
   </div>
 
-  <!-- TREE CONTAINER -->
+  <!-- TREE -->
   <div id="tree-wrap">
     <svg id="svg">
       <g id="viewport">
@@ -48,19 +58,17 @@
         <g id="node-layer"></g>
       </g>
     </svg>
-    
     <div class="controls">
-      <button class="btn btn-circle btn-sm shadow bg-white" onclick="changeZoom(1.2)">+</button>
-      <button class="btn btn-circle btn-sm shadow bg-white" onclick="changeZoom(0.8)">-</button>
-      <button class="btn btn-sm shadow bg-white text-error" onclick="highlightOrphans()" title="Показать людей без связей">⚠️ Сироты</button>
-      <button class="btn btn-sm shadow bg-white" onclick="togglePhysics()" id="phys-btn">❄️ Заморозить</button>
+      <button class="btn btn-circle btn-sm shadow bg-white" onclick="changeZoom(1.3)" title="Приблизить">+</button>
+      <button class="btn btn-circle btn-sm shadow bg-white" onclick="changeZoom(0.77)" title="Отдалить">−</button>
+      <button class="btn btn-sm shadow bg-white text-warning" onclick="showOrphans()" title="Люди без связей">⚠ Без связей</button>
     </div>
   </div>
 </div>
 
 <!-- INFO MODAL -->
 <dialog id="modal" class="modal">
-  <div class="modal-box w-full max-w-md">
+  <div class="modal-box w-full max-w-md max-h-screen overflow-y-auto">
     <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost absolute right-3 top-3">✕</button></form>
     <div id="modal-content"></div>
   </div>
@@ -68,376 +76,331 @@
 </dialog>
 
 <script>
-// CONFIG
-const W_NODE = 140, H_NODE = 60;
-const Y_STEP = 140; // Height between generations
-const CHARGE = -800;
-const LINK_DIST_SPOUSE = 60;
-const LINK_DIST_CHILD = 100;
+// ── CONFIG ──────────────────────────────────────
+const W = 150, H = 54;          // node size
+const INIT_SCALE = 0.18;        // initial zoom to fit whole tree
+const INIT_TX = 40, INIT_TY = 40;
 
-// STATE
-let PERSONS = {};
-let nodes = [], links = [];
-let simulation;
-let zoom;
-let svg, gView, gNodes, gLinks, gGen;
-let isFrozen = false;
+// ── STATE ────────────────────────────────────────
+let PERSONS = {};               // key → person object (with x,y from VSDX via canvas)
+let allNodes = [];              // D3 node objects
+let allLinks = [];              // D3 link objects
+let svgSel, gView, gNodes, gLinks, gGen, zoomBeh;
 
-// INIT
+// ── BOOT ─────────────────────────────────────────
 async function init() {
   try {
     const r = await fetch('persons.json');
     PERSONS = await r.json();
-    setupD3();
+    setupSVG();
     buildGraph();
-    startSim();
-  } catch(e) { console.error(e); alert('Ошибка загрузки данных'); }
+    drawGenBands();
+    renderLinks();
+    renderNodes();
+    // Initial view: fit entire tree
+    svgSel.call(zoomBeh.transform,
+      d3.zoomIdentity.translate(INIT_TX, INIT_TY).scale(INIT_SCALE));
+  } catch(e) {
+    console.error(e);
+    alert('Ошибка загрузки данных');
+  }
 }
 
-function setupD3() {
-  svg = d3.select('#svg');
-  gView = d3.select('#viewport');
-  gGen = d3.select('#gen-layer');
+// ── SVG SETUP ────────────────────────────────────
+function setupSVG() {
+  svgSel = d3.select('#svg');
+  gView  = d3.select('#viewport');
+  gGen   = d3.select('#gen-layer');
   gLinks = d3.select('#link-layer');
   gNodes = d3.select('#node-layer');
 
-  zoom = d3.zoom()
-    .scaleExtent([0.1, 4])
+  zoomBeh = d3.zoom()
+    .scaleExtent([0.05, 5])
     .on('zoom', e => gView.attr('transform', e.transform));
-  
-  svg.call(zoom).on('dblclick.zoom', null);
-  
-  // Responsive resize
-  window.addEventListener('resize', () => {
-    simulation.alpha(0.3).restart();
-  });
+
+  svgSel.call(zoomBeh).on('dblclick.zoom', null);
 }
 
-// GRAPH BUILDER
+// ── GRAPH ────────────────────────────────────────
 function buildGraph() {
-  // 1. Assign Generations (BFS)
-  const roots = Object.values(PERSONS).filter(p => !p.parents || p.parents.length === 0);
-  const genMap = {};
-  const q = roots.map(p => ({id: p.key, g: 0}));
-  const visited = new Set();
-  
-  // Init all with 0 (default)
-  Object.keys(PERSONS).forEach(k => genMap[k] = 0);
+  // Only persons with VSDX positions
+  allNodes = Object.values(PERSONS)
+    .filter(p => p.x != null && p.y != null)
+    .map(p => ({ id: p.key, data: p, x: p.x, y: p.y }));
 
-  // Run BFS
-  while(q.length) {
-    const {id, g} = q.shift();
-    if(visited.has(id)) {
-      if(g > genMap[id]) genMap[id] = g; // Push down if found deeper path
-      continue;
-    }
-    visited.add(id);
-    genMap[id] = g;
-    
-    const p = PERSONS[id];
-    // Spouses = same gen
-    (p.spouses || []).forEach(sid => {
-      if(PERSONS[sid]) q.push({id: sid, g: g});
-    });
-    // Children = next gen
-    (p.children || []).forEach(cid => {
-      if(PERSONS[cid]) q.push({id: cid, g: g + 1});
-    });
-  }
-  
-  // Normalize gens (start from 0)
-  const minG = Math.min(...Object.values(genMap));
-  Object.keys(genMap).forEach(k => genMap[k] -= minG);
+  const nodeSet = new Set(allNodes.map(n => n.id));
+  const seen = new Set();
 
-  // 2. Create Nodes
-  nodes = Object.values(PERSONS).map(p => ({
-    id: p.key,
-    data: p,
-    gen: genMap[p.key] || 0,
-    x: 0, 
-    y: (genMap[p.key] || 0) * Y_STEP
-  }));
-
-  // 3. Create Links (BIDIRECTIONAL CHECK)
-  links = [];
-  const processed = new Set();
-  
-  const addLink = (src, tgt, type) => {
-    if(!PERSONS[src] || !PERSONS[tgt]) return;
-    // Normalized pair key to avoid duplicates A-B vs B-A
-    const pair = [src, tgt].sort().join('|') + '|' + type;
-    if(processed.has(pair)) return;
-    processed.add(pair);
-    
-    // Always direct from source -> target for D3, but logic is bidirectional
-    links.push({source: src, target: tgt, type: type});
-  };
-
-  nodes.forEach(n => {
+  allNodes.forEach(n => {
     const p = n.data;
-    const id = n.id;
-    
-    // Spouses
-    (p.spouses || []).forEach(sid => addLink(id, sid, 'spouse'));
-
-    // Parent -> Child (from children array)
-    (p.children || []).forEach(cid => addLink(id, cid, 'child'));
-
-    // Child -> Parent (from parents array - CRITICAL FIX)
-    // If THIS person lists someone as parent, link parent -> this person
-    (p.parents || []).forEach(pid => addLink(pid, id, 'child'));
+    // Parent → child edges
+    (p.children || []).forEach(cid => {
+      if (!nodeSet.has(cid)) return;
+      const key = `${n.id}→${cid}`;
+      if (!seen.has(key)) { seen.add(key); allLinks.push({ s: n.id, t: cid, type: 'child' }); }
+    });
+    // Spouse edges (deduplicated)
+    (p.spouses || []).forEach(sid => {
+      if (!nodeSet.has(sid)) return;
+      const pair = [n.id, sid].sort().join('|');
+      if (!seen.has(pair)) { seen.add(pair); allLinks.push({ s: n.id, t: sid, type: 'spouse' }); }
+    });
   });
-
-  drawGenerations(Math.max(...Object.values(genMap)));
 }
 
-function drawGenerations(maxGen) {
+// ── GENERATION BANDS ─────────────────────────────
+function drawGenBands() {
+  // Compute distinct Y levels (rounded to nearest 100)
+  const yLevels = [...new Set(allNodes.map(n => Math.round(n.y / 200) * 200))].sort((a,b)=>a-b);
+  const BAND_H = 180;
+  const xMin = Math.min(...allNodes.map(n => n.x)) - 500;
+  const xMax = Math.max(...allNodes.map(n => n.x)) + 500;
+  const totalW = xMax - xMin;
+
   gGen.selectAll('*').remove();
-  for(let i=0; i<=maxGen; i++) {
-    const y = i * Y_STEP;
-    gGen.append('line')
-      .attr('class', 'gen-line')
-      .attr('x1', -5000).attr('x2', 5000)
-      .attr('y1', y).attr('y2', y);
+
+  const genNames = [
+    'Основатели', 'Прапрадеды', 'Прадеды', 'Деды', 'Поколение 5',
+    'Поколение 6', 'Поколение 7 (родители)', 'Наше поколение', 'Дети'
+  ];
+
+  yLevels.forEach((yc, i) => {
+    gGen.append('rect')
+      .attr('class', i % 2 === 0 ? 'gen-band-even' : 'gen-band-odd')
+      .attr('x', xMin).attr('y', yc - BAND_H/2)
+      .attr('width', totalW).attr('height', BAND_H);
     gGen.append('text')
       .attr('class', 'gen-label')
-      .attr('x', -480).attr('y', y - 5)
-      .text(`ПОКОЛЕНИЕ ${i+1}`);
-  }
+      .attr('x', xMin + 10).attr('y', yc - BAND_H/2 + 16)
+      .text(genNames[i] || `Поколение ${i+1}`);
+  });
 }
 
-// SIMULATION
-function startSim() {
-  simulation = d3.forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id(d => d.id)
-      .distance(d => d.type === 'spouse' ? LINK_DIST_SPOUSE : LINK_DIST_CHILD)
-      .strength(d => d.type === 'spouse' ? 1.5 : 0.8)
-    )
-    .force('charge', d3.forceManyBody().strength(CHARGE))
-    .force('collide', d3.forceCollide().radius(W_NODE/1.5).strength(1))
-    .force('y', d3.forceY().y(d => d.gen * Y_STEP).strength(4)) // Strict layers
-    .force('x', d3.forceX().strength(0.02)) // Slight center gravity
-    .on('tick', ticked);
+// ── LINKS ─────────────────────────────────────────
+function renderLinks() {
+  const nodeMap = Object.fromEntries(allNodes.map(n => [n.id, n]));
+  gLinks.selectAll('*').remove();
 
-  // Drag behavior
-  const drag = d3.drag()
-    .on('start', e => {
-      if(!e.active) simulation.alphaTarget(0.3).restart();
-      e.subject.fx = e.subject.x;
-      e.subject.fy = e.subject.y;
-    })
-    .on('drag', e => {
-      e.subject.fx = e.x;
-      e.subject.fy = e.y;
-    })
-    .on('end', e => {
-      if(!e.active) simulation.alphaTarget(0);
-      e.subject.fx = null;
-      e.subject.fy = null;
-    });
+  allLinks.forEach(lk => {
+    const s = nodeMap[lk.s], t = nodeMap[lk.t];
+    if (!s || !t) return;
 
-  // Render Links
-  const link = gLinks.selectAll('line')
-    .data(links)
-    .enter().append('line')
-    .attr('class', d => d.type === 'spouse' ? 'link-spouse' : 'link-child');
+    if (lk.type === 'spouse') {
+      // Straight horizontal line between spouses
+      const x1 = s.x < t.x ? s.x + W/2 : s.x - W/2;
+      const x2 = s.x < t.x ? t.x - W/2 : t.x + W/2;
+      const y = (s.y + t.y) / 2;
+      gLinks.append('line')
+        .datum(lk)
+        .attr('class', 'link-spouse')
+        .attr('x1', x1).attr('y1', s.y)
+        .attr('x2', x2).attr('y2', t.y);
+    } else {
+      // Orthogonal parent→child path
+      const px = s.x, py = s.y + H/2;
+      const cx = t.x, cy = t.y - H/2;
+      const my = (py + cy) / 2;
+      gLinks.append('path')
+        .datum(lk)
+        .attr('class', 'link-child')
+        .attr('d', `M${px},${py} L${px},${my} L${cx},${my} L${cx},${cy}`);
+    }
+  });
+}
 
-  // Render Nodes
+// ── NODES ─────────────────────────────────────────
+function renderNodes() {
+  gNodes.selectAll('*').remove();
+
   const node = gNodes.selectAll('.node')
-    .data(nodes)
+    .data(allNodes)
     .enter().append('g')
     .attr('class', 'node')
     .attr('data-id', d => d.id)
-    .call(drag)
-    .on('click', (e, d) => {
-       if (e.defaultPrevented) return; // ignore drag-click
-       openModal(d.data);
-    });
+    .attr('transform', d => `translate(${d.x},${d.y})`)
+    .on('click', (e, d) => openModal(d.data));
 
-  // Node Shape
+  // Background rect
   node.append('rect')
-    .attr('width', W_NODE).attr('height', H_NODE)
-    .attr('x', -W_NODE/2).attr('y', -H_NODE/2)
-    .attr('rx', 8).attr('ry', 8)
-    .attr('fill', d => getGenderColor(d.data))
-    .attr('stroke', '#cbd5e1')
-    .attr('stroke-width', 2);
+    .attr('x', -W/2).attr('y', -H/2)
+    .attr('width', W).attr('height', H)
+    .attr('rx', 7).attr('ry', 7)
+    .attr('fill', d => nodeColor(d.data))
+    .attr('stroke', '#c9b89a')
+    .attr('stroke-width', 1.5);
 
-  // Photo / Initial
+  // Photo or initial
+  const PHOTO_R = 20;
+  const photoX = -W/2 + 8;
+  const photoY = 0;
+
   node.each(function(d) {
     const g = d3.select(this);
-    const sz = 40;
-    const x = -W_NODE/2 + 10;
-    const y = -sz/2;
-    
-    // Clip path for photo
-    const clipId = 'clip-' + d.id.replace(/[^a-z0-9]/gi,'');
+    const clipId = 'clip_' + d.id.replace(/[^\w]/g, '_');
     g.append('clipPath').attr('id', clipId)
-     .append('circle').attr('cx', x + sz/2).attr('cy', y + sz/2).attr('r', sz/2);
+     .append('circle').attr('cx', photoX + PHOTO_R).attr('cy', photoY).attr('r', PHOTO_R);
 
-    if(d.data.photo) {
+    if (d.data.photo) {
       g.append('image')
         .attr('href', 'photos/' + d.data.photo)
-        .attr('x', x).attr('y', y)
-        .attr('width', sz).attr('height', sz)
+        .attr('x', photoX).attr('y', photoY - PHOTO_R)
+        .attr('width', PHOTO_R*2).attr('height', PHOTO_R*2)
         .attr('clip-path', `url(#${clipId})`)
         .attr('preserveAspectRatio', 'xMidYMid slice')
-        .on('error', function() { d3.select(this).remove(); drawInitial(g, d.data, x, y, sz); });
+        .on('error', function() {
+          d3.select(this).remove();
+          drawInitial(g, d.data, photoX + PHOTO_R, photoY, PHOTO_R);
+        });
     } else {
-      drawInitial(g, d.data, x, y, sz);
+      drawInitial(g, d.data, photoX + PHOTO_R, photoY, PHOTO_R);
     }
   });
 
-  // Text Name
+  // Name text
+  const textX = -W/2 + PHOTO_R*2 + 14;
   node.append('text')
-    .attr('x', -W_NODE/2 + 60).attr('y', -5)
-    .attr('font-size', '12px').attr('font-weight', 'bold')
-    .attr('fill', '#1e293b')
-    .text(d => truncate(d.data.full_name || d.data.first_name, 12));
+    .attr('x', textX).attr('y', -8)
+    .attr('font-size', '11px').attr('font-weight', '600')
+    .attr('fill', '#2d1f0e')
+    .text(d => truncate(d.data.full_name || d.data.first_name, 13));
 
-  // Text Dates
+  // Dates text
   node.append('text')
-    .attr('x', -W_NODE/2 + 60).attr('y', 12)
-    .attr('font-size', '10px').attr('fill', '#64748b')
+    .attr('x', textX).attr('y', 8)
+    .attr('font-size', '9.5px').attr('fill', '#7a6248')
     .text(d => cleanDates(d.data));
-
-  function ticked() {
-    link
-      .attr('x1', d => d.source.x)
-      .attr('y1', d => d.source.y)
-      .attr('x2', d => d.target.x)
-      .attr('y2', d => d.target.y);
-
-    node.attr('transform', d => `translate(${d.x},${d.y})`);
-  }
 }
 
-// HELPERS
-function getGenderColor(p) {
-  const name = (p.first_name || p.full_name || '').toLowerCase();
-  const maleEnds = ['й', 'м', 'н', 'р', 'с', 'в']; // Heuristic
-  // Simple heuristics, can be improved or read from data if available
-  const first = name.split(' ')[0];
-  if(['анна','мария','ольга','елена','татьяна','наталья','светлана'].includes(first)) return '#eff6ff'; // Female (blue tint)
-  if(['александр','сергей','иван','владимир'].includes(first)) return '#f0fdf4'; // Male (green tint)
-  return '#ffffff'; // Default white
+function nodeColor(p) {
+  if (p.death) return '#ede8e0';   // deceased: slightly darker
+  if (p.photo) return '#fefbf6';   // has photo: warm white
+  return '#faf6f0';                // default: warm
 }
 
-function drawInitial(g, p, x, y, sz) {
-  g.append('circle').attr('cx', x+sz/2).attr('cy', y+sz/2).attr('r', sz/2).attr('fill', '#e2e8f0');
-  g.append('text').attr('x', x+sz/2).attr('y', y+sz/2+5).attr('text-anchor', 'middle')
-    .attr('font-size', '16px').attr('font-weight', 'bold').attr('fill', '#64748b')
-    .text((p.first_name || p.full_name || '?')[0]);
+function drawInitial(g, p, cx, cy, r) {
+  g.append('circle').attr('cx', cx).attr('cy', cy).attr('r', r).attr('fill', '#d4c4a8');
+  g.append('text').attr('x', cx).attr('y', cy + 5)
+   .attr('text-anchor', 'middle').attr('font-size', '14px')
+   .attr('font-weight', 'bold').attr('fill', '#7a6248')
+   .text((p.first_name || p.full_name || '?')[0]);
 }
 
+// ── HELPERS ───────────────────────────────────────
 function truncate(str, n) {
-  if(!str) return '';
-  return str.length > n ? str.substr(0,n-1) + '..' : str;
+  if (!str) return '';
+  return str.length > n ? str.slice(0, n-1) + '…' : str;
 }
 
-function extractYear(dateStr) {
-  if (!dateStr) return '';
-  // Format: YYYY or DD.MM.YYYY or MM.YYYY
-  const m = dateStr.match(/\b(\d{4})\b/);
+function extractYear(s) {
+  if (!s) return '';
+  const m = s.match(/\b(\d{4})\b/);
   return m ? m[1] : '';
 }
 
 function cleanDates(p) {
-  const b = extractYear(p.birth);
-  const d = extractYear(p.death);
-  if(!b) return '';
-  return b + (d ? ' - ' + d : '');
+  const b = extractYear(p.birth), d = extractYear(p.death);
+  if (!b) return '';
+  return d ? `${b} – ${d}` : b;
 }
 
-// UI ACTIONS
-function searchNode(q) {
-  const term = q.toLowerCase();
-  gNodes.selectAll('.node rect').attr('stroke', '#cbd5e1').attr('stroke-width', 2);
-  
-  if(!term) return;
-  const match = nodes.find(n => 
-    (n.data.full_name || '').toLowerCase().includes(term) ||
-    (n.data.first_name || '').toLowerCase().includes(term)
+// ── SEARCH ────────────────────────────────────────
+function onSearch(q) {
+  const term = q.trim().toLowerCase();
+  if (!term) {
+    gNodes.selectAll('.node').classed('found', false).classed('dim', false);
+    return;
+  }
+  const matched = new Set();
+  allNodes.forEach(n => {
+    const name = (n.data.full_name || n.data.first_name || '').toLowerCase();
+    if (name.includes(term)) matched.add(n.id);
+  });
+
+  gNodes.selectAll('.node')
+    .classed('found', d => matched.has(d.id))
+    .classed('dim', d => !matched.has(d.id));
+
+  // Pan to first match
+  if (matched.size > 0) {
+    const first = allNodes.find(n => matched.has(n.id));
+    if (first) panTo(first.x, first.y, 0.8);
+  }
+}
+
+// ── ORPHANS ───────────────────────────────────────
+function showOrphans() {
+  const connected = new Set(allLinks.flatMap(l => [l.s, l.t]));
+  const orphans = allNodes.filter(n => !connected.has(n.id));
+  if (!orphans.length) { alert('Все люди имеют связи!'); return; }
+
+  const names = orphans.map(o => o.data.full_name || o.id).join('\n');
+  alert(`${orphans.length} человек без связей:\n${names}`);
+
+  gNodes.selectAll('.node')
+    .classed('found', d => orphans.some(o => o.id === d.id))
+    .classed('dim', d => !orphans.some(o => o.id === d.id));
+}
+
+// ── VIEW CONTROLS ─────────────────────────────────
+function panTo(x, y, scale) {
+  const sw = document.getElementById('svg').clientWidth;
+  const sh = document.getElementById('svg').clientHeight;
+  svgSel.transition().duration(600).call(
+    zoomBeh.transform,
+    d3.zoomIdentity.translate(sw/2 - x * scale, sh/2 - y * scale).scale(scale)
   );
-  
-  if(match) {
-    gNodes.selectAll('.node').filter(d => d.id === match.id)
-      .select('rect').attr('stroke', '#ea580c').attr('stroke-width', 4);
-    
-    // Pan to node
-    svg.transition().duration(750).call(
-      zoom.transform,
-      d3.zoomIdentity.translate(window.innerWidth/2 - match.x, window.innerHeight/2 - match.y).scale(1)
-    );
-  }
 }
 
-function highlightOrphans() {
-  const orphans = nodes.filter(n => {
-    // Has NO links connected to this node
-    // Using D3 force simulation links structure (it modifies links to hold node references)
-    // But initially links hold objects {source: ID, target: ID}
-    return !links.some(l => 
-       (l.source.id === n.id || l.source === n.id || l.source === n) || 
-       (l.target.id === n.id || l.target === n.id || l.target === n)
-    );
-  });
-  
-  if(!orphans.length) { alert('Все люди имеют связи!'); return; }
-  
-  gNodes.selectAll('.node rect').attr('stroke', '#cbd5e1').attr('stroke-width', 2);
-  orphans.forEach(o => {
-    gNodes.select(`.node[data-id="${o.id}"] rect`)
-      .attr('stroke', '#ef4444')
-      .attr('stroke-width', 4);
-  });
-  alert(`Найдено ${orphans.length} людей без связей.\nОни подсвечены красным.`);
-}
-
-function togglePhysics() {
-  const btn = document.getElementById('phys-btn');
-  if(isFrozen) {
-    simulation.alpha(0.3).restart();
-    btn.innerText = '❄️ Заморозить';
-    isFrozen = false;
-  } else {
-    simulation.stop();
-    btn.innerText = '▶️ Запустить';
-    isFrozen = true;
-  }
-}
-
-function changeZoom(factor) {
-  svg.transition().call(zoom.scaleBy, factor);
+function changeZoom(f) {
+  svgSel.transition().duration(200).call(zoomBeh.scaleBy, f);
 }
 
 function resetView() {
-  svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
+  svgSel.transition().duration(600).call(
+    zoomBeh.transform,
+    d3.zoomIdentity.translate(INIT_TX, INIT_TY).scale(INIT_SCALE)
+  );
 }
 
+// ── MODAL ─────────────────────────────────────────
 function openModal(p) {
-  const content = document.getElementById('modal-content');
-  const rels = (label, arr) => {
-    if(!arr || !arr.length) return '';
-    return `<div class="mt-2"><div class="font-bold text-xs uppercase text-gray-400">${label}</div>` +
-    arr.map(id => {
-      const per = PERSONS[id];
-      return per ? `<span class="badge badge-outline mr-1 cursor-pointer hover:bg-base-200" onclick="searchNode('${per.full_name}')">${per.full_name}</span>` : '';
-    }).join('') + `</div>`;
+  const block = (label, arr) => {
+    if (!arr || !arr.length) return '';
+    const links = arr.map(id => {
+      const q = PERSONS[id];
+      if (!q) return '';
+      return `<span class="badge badge-outline mr-1 mb-1 cursor-pointer hover:bg-base-200"
+        onclick="closeModal();setTimeout(()=>{highlightAndGo('${id}')},200)">${q.full_name || id}</span>`;
+    }).join('');
+    return `<div class="mt-3"><div class="text-xs font-bold uppercase text-gray-400 mb-1">${label}</div>${links}</div>`;
   };
 
-  content.innerHTML = `
+  document.getElementById('modal-content').innerHTML = `
     <h3 class="font-bold text-xl">${p.full_name || p.first_name}</h3>
-    <div class="text-gray-500 text-sm mb-4">${cleanDates(p)}</div>
-    ${p.photo ? `<img src="photos/${p.photo}" class="w-full max-h-64 object-contain rounded-lg bg-base-200 mb-4">` : ''}
-    ${p.profession ? `<div class="badge badge-primary mb-4">${p.profession}</div>` : ''}
-    
-    <div class="divider">Семья</div>
-    ${rels('Супруги', p.spouses)}
-    ${rels('Родители', p.parents)}
-    ${rels('Дети', p.children)}
+    <div class="text-gray-500 text-sm mb-3">${cleanDates(p)}${p.profession ? ' · ' + p.profession : ''}</div>
+    ${p.photo ? `<img src="photos/${p.photo}" class="w-full max-h-56 object-contain rounded-xl bg-base-200 mb-3">` : ''}
+    <div class="divider my-2">Семья</div>
+    ${block('💑 Супруги', p.spouses)}
+    ${block('👨‍👩‍👧 Родители', p.parents)}
+    ${block('👶 Дети', p.children)}
+    ${block('👫 Братья / сёстры', p.siblings)}
   `;
   document.getElementById('modal').showModal();
+}
+
+function closeModal() {
+  document.getElementById('modal').close();
+}
+
+function highlightAndGo(id) {
+  gNodes.selectAll('.node').classed('found', false).classed('dim', false);
+  const n = allNodes.find(n => n.id === id);
+  if (!n) return;
+  gNodes.selectAll('.node')
+    .classed('found', d => d.id === id)
+    .classed('dim', d => d.id !== id);
+  panTo(n.x, n.y, 1.2);
+  setTimeout(() => openModal(PERSONS[id]), 400);
 }
 
 init();
