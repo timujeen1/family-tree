@@ -1044,7 +1044,9 @@
     "photo": "",
     "spouses": [],
     "parents": [],
-    "children": [],
+    "children": [
+      "Мария"
+    ],
     "siblings": [],
     "x": 9977,
     "y": 100
@@ -1987,7 +1989,9 @@
     "spouses": [
       "Петро"
     ],
-    "parents": [],
+    "parents": [
+      "Кирил"
+    ],
     "children": [
       "Зина",
       "Педашенко Василь"
