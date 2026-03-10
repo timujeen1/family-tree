@@ -139,11 +139,14 @@ function buildGraph() {
       const key = `${n.id}→${cid}`;
       if (!seen.has(key)) { seen.add(key); allLinks.push({ s: n.id, t: cid, type: 'child' }); }
     });
-    // Spouse edges (deduplicated)
-    (p.spouses || []).forEach(sid => {
-      if (!nodeSet.has(sid)) return;
+    // Spouse edges (deduplicated), with yOffset for multiple marriages
+    const validSpouses = (p.spouses || []).filter(sid => nodeSet.has(sid));
+    validSpouses.forEach((sid, idx) => {
       const pair = [n.id, sid].sort().join('|');
-      if (!seen.has(pair)) { seen.add(pair); allLinks.push({ s: n.id, t: sid, type: 'spouse' }); }
+      // yOffset: spread multiple marriages vertically (±15px per slot)
+      const total = validSpouses.length;
+      const yOffset = total > 1 ? (idx - (total - 1) / 2) * 28 : 0;
+      if (!seen.has(pair)) { seen.add(pair); allLinks.push({ s: n.id, t: sid, type: 'spouse', yOffset }); }
     });
   });
 }
@@ -211,15 +214,15 @@ function renderLinks() {
     if (!s || !t) return;
 
     if (lk.type === 'spouse') {
-      // Straight horizontal line between spouses
+      // Straight horizontal line between spouses, with vertical offset for multiple marriages
       const x1 = s.x < t.x ? s.x + W/2 : s.x - W/2;
       const x2 = s.x < t.x ? t.x - W/2 : t.x + W/2;
-      const y = (s.y + t.y) / 2;
+      const yo = lk.yOffset || 0;
       gLinks.append('line')
         .datum(lk)
         .attr('class', 'link-spouse')
-        .attr('x1', x1).attr('y1', s.y)
-        .attr('x2', x2).attr('y2', t.y);
+        .attr('x1', x1).attr('y1', s.y + yo)
+        .attr('x2', x2).attr('y2', t.y + yo);
     } else {
       // Orthogonal parent→child path
       const px = s.x, py = s.y + H/2;
