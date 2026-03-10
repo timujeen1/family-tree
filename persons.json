@@ -10,7 +10,9 @@
     "photo": "",
     "spouses": [],
     "parents": [],
-    "children": [],
+    "children": [
+      "Ольга_2"
+    ],
     "siblings": [],
     "x": 6566,
     "y": 435
@@ -367,7 +369,9 @@
     "photo": "",
     "spouses": [],
     "parents": [],
-    "children": [],
+    "children": [
+      "Грицаенко Николай"
+    ],
     "siblings": [],
     "x": 11737,
     "y": 1109
@@ -530,7 +534,9 @@
     "spouses": [
       "Слипко Ольга"
     ],
-    "parents": [],
+    "parents": [
+      "Слипко Омелько"
+    ],
     "children": [
       "Слипко Алексндр",
       "Слипко Захарий",
@@ -656,7 +662,9 @@
     "death": "",
     "profession": "",
     "photo": "",
-    "spouses": [],
+    "spouses": [
+      "Слипко Ольга"
+    ],
     "parents": [],
     "children": [],
     "siblings": [],
@@ -793,7 +801,9 @@
     "profession": "Врач",
     "photo": "",
     "spouses": [],
-    "parents": [],
+    "parents": [
+      "Пасичный Анатолий"
+    ],
     "children": [
       "Андрей_2",
       "Виктор_1",
@@ -1048,7 +1058,9 @@
     "spouses": [
       "Мария"
     ],
-    "parents": [],
+    "parents": [
+      "Микита"
+    ],
     "children": [
       "Зина",
       "Педашенко Василь"
@@ -1066,8 +1078,12 @@
     "death": "",
     "profession": "",
     "photo": "",
-    "spouses": [],
-    "parents": [],
+    "spouses": [
+      "Никишина Лидия"
+    ],
+    "parents": [
+      "Грицаенко Феофан"
+    ],
     "children": [],
     "siblings": [],
     "x": 11911,
@@ -1239,7 +1255,9 @@
     "photo": "",
     "spouses": [],
     "parents": [],
-    "children": [],
+    "children": [
+      "Шаповалов Кузьма"
+    ],
     "siblings": [],
     "x": 5918,
     "y": 435
@@ -1327,7 +1345,9 @@
     "photo": "",
     "spouses": [],
     "parents": [],
-    "children": [],
+    "children": [
+      "Никишин Неизвестный"
+    ],
     "siblings": [],
     "x": 11250,
     "y": 1109
@@ -1627,7 +1647,9 @@
     "spouses": [
       "Коба Оришка"
     ],
-    "parents": [],
+    "parents": [
+      "Кривонос Василь"
+    ],
     "children": [
       "Тертышна Ольга",
       "Олена"
@@ -1898,8 +1920,12 @@
     "profession": "",
     "photo": "",
     "spouses": [],
-    "parents": [],
-    "children": [],
+    "parents": [
+      "Никишин Захар"
+    ],
+    "children": [
+      "Никишин Александр"
+    ],
     "siblings": [],
     "x": 11141,
     "y": 1445
@@ -1987,7 +2013,9 @@
     "photo": "",
     "spouses": [],
     "parents": [],
-    "children": [],
+    "children": [
+      "Кривонос Лаврентий"
+    ],
     "siblings": [],
     "x": 8178,
     "y": 423
@@ -2130,7 +2158,9 @@
     "spouses": [
       "Никишина Лидия"
     ],
-    "parents": [],
+    "parents": [
+      "Никишин Неизвестный"
+    ],
     "children": [
       "Никишин Владимир"
     ],
@@ -2177,7 +2207,9 @@
     "photo": "",
     "spouses": [],
     "parents": [],
-    "children": [],
+    "children": [
+      "Петро"
+    ],
     "siblings": [],
     "x": 9748,
     "y": 100
@@ -2437,7 +2469,9 @@
     "photo": "",
     "spouses": [],
     "parents": [],
-    "children": [],
+    "children": [
+      "Слипко Максим"
+    ],
     "siblings": [],
     "x": 10184,
     "y": 107
@@ -2544,7 +2578,9 @@
     "profession": "",
     "photo": "",
     "spouses": [],
-    "parents": [],
+    "parents": [
+      "Река Омелько"
+    ],
     "children": [],
     "siblings": [],
     "x": 9207,
@@ -2644,7 +2680,8 @@
       "Река Андрей_1",
       "Река Яков",
       "Река Борис",
-      "Река Илья"
+      "Река Илья",
+      "Река Денис"
     ],
     "siblings": [],
     "x": 9207,
@@ -2662,7 +2699,9 @@
     "spouses": [
       "Пелагея"
     ],
-    "parents": [],
+    "parents": [
+      "Шаповалов Трохим"
+    ],
     "children": [
       "Шаповалов Тимофей_2"
     ],
@@ -2968,7 +3007,9 @@
     "spouses": [],
     "parents": [],
     "children": [],
-    "siblings": [],
+    "siblings": [
+      "Горшков Михаил"
+    ],
     "x": 5640,
     "y": 1110
   },
@@ -3022,9 +3063,15 @@
     "death": "",
     "profession": "",
     "photo": "",
-    "spouses": [],
-    "parents": [],
-    "children": [],
+    "spouses": [
+      "Белолипецкий Матвей"
+    ],
+    "parents": [
+      "Селифонтий"
+    ],
+    "children": [
+      "Екатерина_2"
+    ],
     "siblings": [],
     "x": 6566,
     "y": 758
@@ -3087,7 +3134,9 @@
     "death": "",
     "profession": "",
     "photo": "",
-    "spouses": [],
+    "spouses": [
+      "Солоха Михаил"
+    ],
     "parents": [],
     "children": [],
     "siblings": [],
@@ -3150,7 +3199,9 @@
     "death": "",
     "profession": "",
     "photo": "",
-    "spouses": [],
+    "spouses": [
+      "Вадим"
+    ],
     "parents": [],
     "children": [],
     "siblings": [],
@@ -3256,9 +3307,13 @@
     "death": "07.02.2016",
     "profession": "Врач",
     "photo": "image17.jpeg",
-    "spouses": [],
+    "spouses": [
+      "Наталия_1"
+    ],
     "parents": [],
-    "children": [],
+    "children": [
+      "Галина_2"
+    ],
     "siblings": [],
     "x": 4109,
     "y": 1780
@@ -3498,7 +3553,9 @@
     "spouses": [],
     "parents": [],
     "children": [],
-    "siblings": [],
+    "siblings": [
+      "Андрей_1"
+    ],
     "x": 6151,
     "y": 435
   },
@@ -3613,9 +3670,13 @@
     "death": "",
     "profession": "Врач",
     "photo": "",
-    "spouses": [],
+    "spouses": [
+      "Пасичный Анатолий"
+    ],
     "parents": [],
-    "children": [],
+    "children": [
+      "Оксана_2"
+    ],
     "siblings": [],
     "x": 4392,
     "y": 1780
@@ -3663,7 +3724,10 @@
     "profession": "",
     "photo": "image56.jpeg",
     "spouses": [],
-    "parents": [],
+    "parents": [
+      "Наталия_1",
+      "Пасичный Анатолий"
+    ],
     "children": [],
     "siblings": [],
     "x": 4439,
@@ -3701,7 +3765,9 @@
     "spouses": [],
     "parents": [],
     "children": [],
-    "siblings": [],
+    "siblings": [
+      "Сергей_1"
+    ],
     "x": 12427,
     "y": 2091
   },
@@ -3762,7 +3828,9 @@
     "death": "",
     "profession": "",
     "photo": "",
-    "spouses": [],
+    "spouses": [
+      "Котлик Игорь"
+    ],
     "parents": [],
     "children": [],
     "siblings": [],
